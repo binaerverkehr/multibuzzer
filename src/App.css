@@ -351,6 +351,57 @@ body {
   transition: all ease-in-out 0.1s;
 }
 
+.App .player-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.App .score {
+  font-weight: 600;
+  color: var(--yellowColor);
+  min-width: 30px;
+  text-align: center;
+}
+
+.App .score-controls {
+  display: flex;
+  gap: 5px;
+}
+
+.App .score-button {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--lightBackgroundColor);
+}
+
+.App .score-button:hover {
+  background-color: var(--activeColor);
+}
+
+@media screen and (max-width: 767px) {
+  .App .player-info {
+    gap: 5px;
+  }
+  
+  .App .score {
+    font-size: 1.2rem;
+  }
+  
+  .App .score-button {
+    width: 20px;
+    height: 20px;
+    font-size: 0.9rem;
+  }
+}
+
 .App .queue li .name {
   font-weight: 600;
 }

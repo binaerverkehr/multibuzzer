@@ -194,12 +194,39 @@ export default function Table(game) {
                     }
                   }}
                 >
-                  <div className={`name ${!connected ? 'dim' : ''}`}>
-                    {name}
-                    {!connected ? (
-                      <AiOutlineDisconnect className="disconnected" />
-                    ) : (
-                      ''
+                  <div className="player-info">
+                    <div className={`name ${!connected ? 'dim' : ''}`}>
+                      {name}
+                      {!connected ? (
+                        <AiOutlineDisconnect className="disconnected" />
+                      ) : (
+                        ''
+                      )}
+                    </div>
+                    <div className="score">
+                      {(game.G.scores && game.G.scores[id]) || 0}
+                    </div>
+                    {isHost && (
+                      <div className="score-controls">
+                        <button
+                          className="score-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            game.moves.incrementScore(id);
+                          }}
+                        >
+                          +
+                        </button>
+                        <button
+                          className="score-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            game.moves.decrementScore(id);
+                          }}
+                        >
+                          -
+                        </button>
+                      </div>
                     )}
                   </div>
                   {i > 0 ? (
