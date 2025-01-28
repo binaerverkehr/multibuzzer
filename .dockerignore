@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Development and source control
+.git/
+.gitignore
+.env
+.env.local
+.env.*
+.eslintrc
+.prettierrc
+README.md
+LICENSE
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+
+# Test files
+**/*.test.js
+**/*.spec.js
+coverage/
+
+# Build artifacts
+build/
+dist/
