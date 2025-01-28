@@ -157,9 +157,9 @@ export default function Table(game) {
           <div id="buzzer">
             <button
               ref={buzzButton}
-              disabled={buzzed || game.G.locked}
+              disabled={buzzed || game.G.locked || game.G.textInputMode}
               onClick={() => {
-                if (!buzzed && !game.G.locked) {
+                if (!buzzed && !game.G.locked && !game.G.textInputMode) {
                   attemptBuzz();
                 }
               }}
@@ -250,7 +250,7 @@ export default function Table(game) {
                 .map(({ id, name }) => (
                   <li key={id}>
                     <div className="player-info">
-                      <div className="name">
+                      <div className={`name ${!game.G.textAnswers[id] ? 'missing-answer' : ''}`}>
                         {name}
                       </div>
                       <div className="answer">
@@ -278,112 +278,110 @@ export default function Table(game) {
               ))}
             </ul>
           </div>
-        ) : (
+        ) : !game.G.textInputMode ? (
           <div className="queue">
             <p>Players Buzzed</p>
-          <ul>
-            {buzzedPlayers.map(({ id, name, timestamp, connected }, i) => (
-              <li key={id} className={isHost ? 'resettable' : null}>
-                <div
-                  className="player-sign"
-                  onClick={() => {
-                    if (isHost) {
-                      game.moves.resetBuzzer(id);
-                    }
-                  }}
-                >
-                  <div className="player-info">
-                    <div className={`name ${!connected ? 'dim' : ''}`}>
-                      {name}
-                      {!connected ? (
-                        <AiOutlineDisconnect className="disconnected" />
-                      ) : (
-                        ''
-                      )}
-                    </div>
-                    <div className="score">
-                      {(game.G.scores && game.G.scores[id]) || 0}
-                    </div>
-                    {isHost && (
-                      <div className="score-controls">
-                        <button
-                          className="score-button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            game.moves.incrementScore(id);
-                          }}
-                        >
-                          +
-                        </button>
-                        <button
-                          className="score-button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            game.moves.decrementScore(id);
-                          }}
-                        >
-                          -
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  {i > 0 ? (
-                    <div className="mini">
-                      {timeDisplay(timestamp - queue[0].timestamp)}
-                    </div>
-                  ) : null}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-        )}
-        {!game.G.textInputMode && (
-          <div className="queue">
-            <p>Other Players</p>
             <ul>
-              {activePlayers.map(({ id, name, connected }) => (
-                <li key={id}>
-                  <div className="player-info">
-                    <div className={`name ${!connected ? 'dim' : ''}`}>
-                      {name}
-                      {!connected ? (
-                        <AiOutlineDisconnect className="disconnected" />
-                      ) : (
-                        ''
+              {buzzedPlayers.map(({ id, name, timestamp, connected }, i) => (
+                <li key={id} className={isHost ? 'resettable' : null}>
+                  <div
+                    className="player-sign"
+                    onClick={() => {
+                      if (isHost) {
+                        game.moves.resetBuzzer(id);
+                      }
+                    }}
+                  >
+                    <div className="player-info">
+                      <div className={`name ${!connected ? 'dim' : ''}`}>
+                        {name}
+                        {!connected ? (
+                          <AiOutlineDisconnect className="disconnected" />
+                        ) : (
+                          ''
+                        )}
+                      </div>
+                      <div className="score">
+                        {(game.G.scores && game.G.scores[id]) || 0}
+                      </div>
+                      {isHost && (
+                        <div className="score-controls">
+                          <button
+                            className="score-button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              game.moves.incrementScore(id);
+                            }}
+                          >
+                            +
+                          </button>
+                          <button
+                            className="score-button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              game.moves.decrementScore(id);
+                            }}
+                          >
+                            -
+                          </button>
+                        </div>
                       )}
                     </div>
-                    <div className="score">
-                      {(game.G.scores && game.G.scores[id]) || 0}
-                    </div>
-                    {isHost && (
-                      <div className="score-controls">
-                        <button
-                          className="score-button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            game.moves.incrementScore(id);
-                          }}
-                        >
-                          +
-                        </button>
-                        <button
-                          className="score-button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            game.moves.decrementScore(id);
-                          }}
-                        >
-                          -
-                        </button>
+                    {i > 0 ? (
+                      <div className="mini">
+                        {timeDisplay(timestamp - queue[0].timestamp)}
                       </div>
-                    )}
+                    ) : null}
                   </div>
                 </li>
               ))}
             </ul>
           </div>
-        )}
+        ) : null}
+        <div className="queue">
+          <p>Other Players</p>
+          <ul>
+            {activePlayers.map(({ id, name, connected }) => (
+              <li key={id}>
+                <div className="player-info">
+                  <div className={`name ${!connected ? 'dim' : ''}`}>
+                    {name}
+                    {!connected ? (
+                      <AiOutlineDisconnect className="disconnected" />
+                    ) : (
+                      ''
+                    )}
+                  </div>
+                  <div className="score">
+                    {(game.G.scores && game.G.scores[id]) || 0}
+                  </div>
+                  {isHost && (
+                    <div className="score-controls">
+                      <button
+                        className="score-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          game.moves.incrementScore(id);
+                        }}
+                      >
+                        +
+                      </button>
+                      <button
+                        className="score-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          game.moves.decrementScore(id);
+                        }}
+                      >
+                        -
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
       </Container>
     </div>
   );
