@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { get, some, values, sortBy, orderBy, isEmpty, round } from 'lodash';
 import { Howl } from 'howler';
 import { AiOutlineDisconnect } from 'react-icons/ai';
+import { BsSoundwave, BsVolumeMute } from 'react-icons/bs';
 import { Container, Form } from 'react-bootstrap';
 import Header from '../components/Header';
 
@@ -11,7 +12,8 @@ export default function Table(game) {
     some(game.G.queue, (o) => o.id === game.playerID)
   );
   const [lastBuzz, setLastBuzz] = useState(null);
-  const [sound, setSound] = useState(false);
+  const [showScorePopup, setShowScorePopup] = useState(null);
+  const [playerSound, setPlayerSound] = useState(true);
   const [soundPlayed, setSoundPlayed] = useState(false);
   const [textAnswer, setTextAnswer] = useState('');
   const buzzButton = useRef(null);
@@ -27,11 +29,22 @@ export default function Table(game) {
   });
 
   const playSound = () => {
-    if (sound && !soundPlayed) {
+    if (playerSound && !soundPlayed) {
       buzzSound.play();
       setSoundPlayed(true);
     }
   };
+
+  // Close score popup when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (showScorePopup && !event.target.closest('.score-popup')) {
+        setShowScorePopup(null);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showScorePopup]);
 
   useEffect(() => {
     console.log(game.G.queue, Date.now());
@@ -134,6 +147,27 @@ export default function Table(game) {
     return `+${delta} ms`;
   };
 
+  const renderPlayerName = (id, name, connected) => (
+    <div className={`name ${!connected ? 'dim' : ''}`}>
+      <div className="name-content">
+        {name}
+        {!connected && <AiOutlineDisconnect className="disconnected" />}
+      </div>
+      {id === game.playerID && (
+        <div 
+          className="sound-toggle" 
+          onClick={(e) => {
+            e.stopPropagation();
+            setPlayerSound(!playerSound);
+          }}
+          title={playerSound ? "Turn off buzzer sound" : "Turn on buzzer sound"}
+        >
+          {playerSound ? <BsSoundwave /> : <BsVolumeMute />}
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div>
       <Header
@@ -145,8 +179,6 @@ export default function Table(game) {
             roomID: null,
           })
         }
-        sound={sound}
-        setSound={() => setSound(!sound)}
       />
       <Container>
         <section>
@@ -154,6 +186,16 @@ export default function Table(game) {
           {!game.isConnected ? (
             <p className="warning">Disconnected - attempting to reconnect...</p>
           ) : null}
+          <div className="sound-control">
+            <button
+              className={`sound-button ${playerSound ? 'active' : ''}`}
+              onClick={() => setPlayerSound(!playerSound)}
+              title={playerSound ? "Turn off buzzer sound" : "Turn on buzzer sound"}
+            >
+              {playerSound ? <BsSoundwave /> : <BsVolumeMute />}
+              {playerSound ? "Sound On" : "Sound Off"}
+            </button>
+          </div>
           <div id="buzzer">
             <button
               ref={buzzButton}
@@ -163,42 +205,61 @@ export default function Table(game) {
                   attemptBuzz();
                 }
               }}
+              className={`${buzzed ? 'buzzed' : ''} ${game.G.locked ? 'locked' : ''}`}
+              aria-label={game.G.locked ? 'Buzzer locked' : buzzed ? 'Already buzzed' : 'Click to buzz'}
+              title={game.G.locked ? 'Buzzer is locked by host' : buzzed ? 'You have already buzzed' : 'Click or press spacebar to buzz'}
             >
               {game.G.locked ? 'Locked' : buzzed ? 'Buzzed' : 'Buzz'}
             </button>
           </div>
           {isHost ? (
-            <div className="settings">
-              <div className="button-container">
+            <div className="settings" role="group" aria-label="Host controls">
+              <div className="settings-grid">
+              <div className="button-container settings-item">
                 <Form.Check
                   type="switch"
                   id="text-input-mode"
                   label="Text Input Mode"
                   checked={game.G.textInputMode}
-                  onChange={() => game.moves.toggleTextInputMode()}
+                  onChange={() => {
+                    if (window.confirm('Switching modes will clear all current buzzes. Continue?')) {
+                      game.moves.toggleTextInputMode();
+                    }
+                  }}
+                  aria-label="Toggle text input mode"
                 />
               </div>
               {game.G.textInputMode ? (
-                <div className="button-container">
-                  <button
-                    className="text-button"
-                    onClick={() => game.moves.toggleTextInputLock()}
-                  >
+                <div className="button-container settings-item">
+                    <button
+                      className="text-button"
+                      onClick={() => game.moves.toggleTextInputLock()}
+                      aria-label={game.G.textInputLocked ? 'Unlock text answers' : 'Lock text answers'}
+                      title={game.G.textInputLocked ? 'Allow participants to submit answers' : 'Prevent new answer submissions'}
+                    >
                     {game.G.textInputLocked ? 'Unlock answers' : 'Lock answers'}
                   </button>
-                  <button
-                    className="text-button"
-                    onClick={() => game.moves.clearTextAnswers()}
-                  >
+                    <button
+                      className="text-button"
+                      onClick={() => {
+                        if (window.confirm('Are you sure you want to clear all answers?')) {
+                          game.moves.clearTextAnswers();
+                        }
+                      }}
+                      aria-label="Clear all text answers"
+                      title="Remove all submitted answers"
+                    >
                     Clear answers
                   </button>
                 </div>
               ) : (
                 <>
-                  <div className="button-container">
+                  <div className="button-container settings-item">
                     <button
                       className="text-button"
                       onClick={() => game.moves.toggleLock()}
+                      aria-label={game.G.locked ? 'Unlock buzzers' : 'Lock buzzers'}
+                      title={game.G.locked ? 'Allow participants to buzz in' : 'Prevent new buzzes'}
                     >
                       {game.G.locked ? 'Unlock buzzers' : 'Lock buzzers'}
                     </button>
@@ -206,14 +267,20 @@ export default function Table(game) {
                   <div className="button-container">
                     <button
                       disabled={isEmpty(game.G.queue)}
-                      onClick={() => game.moves.resetBuzzers()}
+                      onClick={() => {
+                        if (window.confirm('Are you sure you want to reset all buzzers?')) {
+                          game.moves.resetBuzzers();
+                        }
+                      }}
+                      aria-label="Reset all buzzers"
+                      title="Clear all current buzzes"
                     >
                       Reset all buzzers
                     </button>
                   </div>
                 </>
               )}
-              <div className="divider" />
+              </div>
             </div>
           ) : null}
           
@@ -250,37 +317,46 @@ export default function Table(game) {
                 .map(({ id, name }) => (
                   <li key={id}>
                     <div className="player-info">
-                      <div className={`name ${!game.G.textAnswers[id] ? 'missing-answer' : ''}`}>
-                        {name}
-                      </div>
+                      {renderPlayerName(id, name, true)}
                       <div className="answer">
-                        {game.G.textAnswers[id] || 'No answer yet'}
+                        {game.G.textAnswers[id] || '-'}
                       </div>
-                      <div className="score">
+                      <div 
+                        className="score clickable" 
+                        onClick={() => isHost && setShowScorePopup(id)}
+                        title={isHost ? "Click to adjust score" : undefined}
+                      >
                         {(game.G.scores && game.G.scores[id]) || 0}
                       </div>
-                      <div className="score-controls">
-                        <button
-                          className="score-button"
-                          onClick={() => game.moves.incrementScore(id)}
-                        >
-                          +
-                        </button>
-                        <button
-                          className="score-button"
-                          onClick={() => game.moves.decrementScore(id)}
-                        >
-                          -
-                        </button>
-                      </div>
+                      {showScorePopup === id && (
+                        <div className="score-popup">
+                          <div className="score-display">
+                            {(game.G.scores && game.G.scores[id]) || 0}
+                          </div>
+                          <div className="score-controls">
+                            <button
+                              className="score-button"
+                              onClick={() => game.moves.decrementScore(id)}
+                            >
+                              -
+                            </button>
+                            <button
+                              className="score-button"
+                              onClick={() => game.moves.incrementScore(id)}
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </li>
               ))}
             </ul>
           </div>
         ) : !game.G.textInputMode ? (
-          <div className="queue">
-            <p>Players Buzzed</p>
+          <div className="queue" role="region" aria-label="Buzzed players list">
+            <p>Players Buzzed ({buzzedPlayers.length})</p>
             <ul>
               {buzzedPlayers.map(({ id, name, timestamp, connected }, i) => (
                 <li key={id} className={isHost ? 'resettable' : null}>
@@ -293,37 +369,42 @@ export default function Table(game) {
                     }}
                   >
                     <div className="player-info">
-                      <div className={`name ${!connected ? 'dim' : ''}`}>
-                        {name}
-                        {!connected ? (
-                          <AiOutlineDisconnect className="disconnected" />
-                        ) : (
-                          ''
-                        )}
-                      </div>
-                      <div className="score">
+                      {renderPlayerName(id, name, connected)}
+                      <div 
+                        className="score clickable" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          isHost && setShowScorePopup(id);
+                        }}
+                        title={isHost ? "Click to adjust score" : undefined}
+                      >
                         {(game.G.scores && game.G.scores[id]) || 0}
                       </div>
-                      {isHost && (
-                        <div className="score-controls">
-                          <button
-                            className="score-button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              game.moves.incrementScore(id);
-                            }}
-                          >
-                            +
-                          </button>
-                          <button
-                            className="score-button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              game.moves.decrementScore(id);
-                            }}
-                          >
-                            -
-                          </button>
+                      {showScorePopup === id && (
+                        <div className="score-popup">
+                          <div className="score-display">
+                            {(game.G.scores && game.G.scores[id]) || 0}
+                          </div>
+                          <div className="score-controls">
+                            <button
+                              className="score-button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                game.moves.decrementScore(id);
+                              }}
+                            >
+                              -
+                            </button>
+                            <button
+                              className="score-button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                game.moves.incrementScore(id);
+                              }}
+                            >
+                              +
+                            </button>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -338,43 +419,39 @@ export default function Table(game) {
             </ul>
           </div>
         ) : null}
-        <div className="queue">
-          <p>Other Players</p>
+          <div className="queue" role="region" aria-label="Other players list">
+            <p>Other Players ({activePlayers.length})</p>
           <ul>
             {activePlayers.map(({ id, name, connected }) => (
               <li key={id}>
                 <div className="player-info">
-                  <div className={`name ${!connected ? 'dim' : ''}`}>
-                    {name}
-                    {!connected ? (
-                      <AiOutlineDisconnect className="disconnected" />
-                    ) : (
-                      ''
-                    )}
-                  </div>
-                  <div className="score">
+                  {renderPlayerName(id, name, connected)}
+                  <div 
+                    className="score clickable" 
+                    onClick={() => isHost && setShowScorePopup(id)}
+                    title={isHost ? "Click to adjust score" : undefined}
+                  >
                     {(game.G.scores && game.G.scores[id]) || 0}
                   </div>
-                  {isHost && (
-                    <div className="score-controls">
-                      <button
-                        className="score-button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          game.moves.incrementScore(id);
-                        }}
-                      >
-                        +
-                      </button>
-                      <button
-                        className="score-button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          game.moves.decrementScore(id);
-                        }}
-                      >
-                        -
-                      </button>
+                  {showScorePopup === id && (
+                    <div className="score-popup">
+                      <div className="score-display">
+                        {(game.G.scores && game.G.scores[id]) || 0}
+                      </div>
+                      <div className="score-controls">
+                        <button
+                          className="score-button"
+                          onClick={() => game.moves.decrementScore(id)}
+                        >
+                          -
+                        </button>
+                        <button
+                          className="score-button"
+                          onClick={() => game.moves.incrementScore(id)}
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
