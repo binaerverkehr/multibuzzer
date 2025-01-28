@@ -14,6 +14,29 @@ function toggleLock(G) {
   G.locked = !G.locked;
 }
 
+function toggleTextInputMode(G) {
+  G.textInputMode = !G.textInputMode;
+  // Reset text answers when toggling mode
+  G.textAnswers = {};
+}
+
+function toggleTextInputLock(G) {
+  G.textInputLocked = !G.textInputLocked;
+}
+
+function submitTextAnswer(G, ctx, playerID, answer) {
+  if (!G.textInputLocked) {
+    G.textAnswers = {
+      ...G.textAnswers,
+      [playerID]: answer
+    };
+  }
+}
+
+function clearTextAnswers(G) {
+  G.textAnswers = {};
+}
+
 function buzz(G, ctx, id) {
   const newQueue = {
     ...G.queue,
@@ -55,6 +78,9 @@ export const Buzzer = {
     queue: {},
     locked: false,
     scores: {},
+    textInputMode: false,
+    textInputLocked: false,
+    textAnswers: {},
   }),
   phases: {
     play: {
@@ -64,6 +90,10 @@ export const Buzzer = {
         resetBuzzer,
         resetBuzzers,
         toggleLock,
+        toggleTextInputMode,
+        toggleTextInputLock,
+        submitTextAnswer,
+        clearTextAnswers,
         incrementScore,
         decrementScore,
       },

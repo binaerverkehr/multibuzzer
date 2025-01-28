@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { get, some, values, sortBy, orderBy, isEmpty, round } from 'lodash';
 import { Howl } from 'howler';
 import { AiOutlineDisconnect } from 'react-icons/ai';
-import { Container } from 'react-bootstrap';
+import { Container, Form } from 'react-bootstrap';
 import Header from '../components/Header';
 
 export default function Table(game) {
@@ -13,6 +13,7 @@ export default function Table(game) {
   const [lastBuzz, setLastBuzz] = useState(null);
   const [sound, setSound] = useState(false);
   const [soundPlayed, setSoundPlayed] = useState(false);
+  const [textAnswer, setTextAnswer] = useState('');
   const buzzButton = useRef(null);
   const queueRef = useRef(null);
 
@@ -73,17 +74,24 @@ export default function Table(game) {
     }
   };
 
-  // spacebar will buzz
+  // Clear text answer when host clears answers
+  useEffect(() => {
+    if (isEmpty(game.G.textAnswers)) {
+      setTextAnswer('');
+    }
+  }, [game.G.textAnswers]);
+
+  // spacebar will buzz only when not in text input mode
   useEffect(() => {
     function onKeydown(e) {
-      if (e.keyCode === 32 && !e.repeat) {
+      if (e.keyCode === 32 && !e.repeat && !game.G.textInputMode && e.target.tagName !== 'INPUT') {
         buzzButton.current.click();
         e.preventDefault();
       }
     }
     window.addEventListener('keydown', onKeydown);
     return () => window.removeEventListener('keydown', onKeydown);
-  }, []);
+  }, [game.G.textInputMode]);
 
   const players = !game.gameMetadata
     ? []
@@ -162,27 +170,117 @@ export default function Table(game) {
           {isHost ? (
             <div className="settings">
               <div className="button-container">
-                <button
-                  className="text-button"
-                  onClick={() => game.moves.toggleLock()}
-                >
-                  {game.G.locked ? 'Unlock buzzers' : 'Lock buzzers'}
-                </button>
+                <Form.Check
+                  type="switch"
+                  id="text-input-mode"
+                  label="Text Input Mode"
+                  checked={game.G.textInputMode}
+                  onChange={() => game.moves.toggleTextInputMode()}
+                />
               </div>
-              <div className="button-container">
-                <button
-                  disabled={isEmpty(game.G.queue)}
-                  onClick={() => game.moves.resetBuzzers()}
-                >
-                  Reset all buzzers
-                </button>
-              </div>
+              {game.G.textInputMode ? (
+                <div className="button-container">
+                  <button
+                    className="text-button"
+                    onClick={() => game.moves.toggleTextInputLock()}
+                  >
+                    {game.G.textInputLocked ? 'Unlock answers' : 'Lock answers'}
+                  </button>
+                  <button
+                    className="text-button"
+                    onClick={() => game.moves.clearTextAnswers()}
+                  >
+                    Clear answers
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="button-container">
+                    <button
+                      className="text-button"
+                      onClick={() => game.moves.toggleLock()}
+                    >
+                      {game.G.locked ? 'Unlock buzzers' : 'Lock buzzers'}
+                    </button>
+                  </div>
+                  <div className="button-container">
+                    <button
+                      disabled={isEmpty(game.G.queue)}
+                      onClick={() => game.moves.resetBuzzers()}
+                    >
+                      Reset all buzzers
+                    </button>
+                  </div>
+                </>
+              )}
               <div className="divider" />
             </div>
           ) : null}
+          
+          {game.G.textInputMode && !isHost ? (
+            <div className="text-input-container">
+              <Form.Control
+                type="text"
+                placeholder="Enter your answer..."
+                value={textAnswer}
+                onChange={(e) => setTextAnswer(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && !game.G.textInputLocked) {
+                    game.moves.submitTextAnswer(game.playerID, textAnswer);
+                  }
+                }}
+                disabled={game.G.textInputLocked}
+              />
+              <button
+                className="submit-answer"
+                disabled={game.G.textInputLocked || !textAnswer.trim()}
+                onClick={() => game.moves.submitTextAnswer(game.playerID, textAnswer)}
+              >
+                Submit Answer
+              </button>
+            </div>
+          ) : null}
         </section>
-        <div className="queue">
-          <p>Players Buzzed</p>
+        {game.G.textInputMode && isHost ? (
+          <div className="queue">
+            <p>Player Answers</p>
+            <ul>
+              {players
+                .filter(p => p.connected)
+                .map(({ id, name }) => (
+                  <li key={id}>
+                    <div className="player-info">
+                      <div className="name">
+                        {name}
+                      </div>
+                      <div className="answer">
+                        {game.G.textAnswers[id] || 'No answer yet'}
+                      </div>
+                      <div className="score">
+                        {(game.G.scores && game.G.scores[id]) || 0}
+                      </div>
+                      <div className="score-controls">
+                        <button
+                          className="score-button"
+                          onClick={() => game.moves.incrementScore(id)}
+                        >
+                          +
+                        </button>
+                        <button
+                          className="score-button"
+                          onClick={() => game.moves.decrementScore(id)}
+                        >
+                          -
+                        </button>
+                      </div>
+                    </div>
+                  </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <div className="queue">
+            <p>Players Buzzed</p>
           <ul>
             {buzzedPlayers.map(({ id, name, timestamp, connected }, i) => (
               <li key={id} className={isHost ? 'resettable' : null}>
@@ -239,50 +337,53 @@ export default function Table(game) {
             ))}
           </ul>
         </div>
-        <div className="queue">
-          <p>Other Players</p>
-          <ul>
-            {activePlayers.map(({ id, name, connected }) => (
-              <li key={id}>
-                <div className="player-info">
-                  <div className={`name ${!connected ? 'dim' : ''}`}>
-                    {name}
-                    {!connected ? (
-                      <AiOutlineDisconnect className="disconnected" />
-                    ) : (
-                      ''
+        )}
+        {!game.G.textInputMode && (
+          <div className="queue">
+            <p>Other Players</p>
+            <ul>
+              {activePlayers.map(({ id, name, connected }) => (
+                <li key={id}>
+                  <div className="player-info">
+                    <div className={`name ${!connected ? 'dim' : ''}`}>
+                      {name}
+                      {!connected ? (
+                        <AiOutlineDisconnect className="disconnected" />
+                      ) : (
+                        ''
+                      )}
+                    </div>
+                    <div className="score">
+                      {(game.G.scores && game.G.scores[id]) || 0}
+                    </div>
+                    {isHost && (
+                      <div className="score-controls">
+                        <button
+                          className="score-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            game.moves.incrementScore(id);
+                          }}
+                        >
+                          +
+                        </button>
+                        <button
+                          className="score-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            game.moves.decrementScore(id);
+                          }}
+                        >
+                          -
+                        </button>
+                      </div>
                     )}
                   </div>
-                  <div className="score">
-                    {(game.G.scores && game.G.scores[id]) || 0}
-                  </div>
-                  {isHost && (
-                    <div className="score-controls">
-                      <button
-                        className="score-button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          game.moves.incrementScore(id);
-                        }}
-                      >
-                        +
-                      </button>
-                      <button
-                        className="score-button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          game.moves.decrementScore(id);
-                        }}
-                      >
-                        -
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </Container>
     </div>
   );

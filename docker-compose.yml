@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  multibuzzer:
+    build: .
+    ports:
+      - "4000:4000"  # React development server port
+      - "4001:4001"  # Game server port
+    environment:
+      - NODE_ENV=development
+      - PORT=4001
+      - WDS_SOCKET_PORT=0  # Required for React hot reloading in Docker
+    volumes:
+      - ./src:/app/src  # For development hot-reloading
+    command: yarn dev  # Use development command instead of production
