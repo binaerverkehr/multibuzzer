@@ -70,6 +70,17 @@ function decrementScore(G, ctx, playerID) {
   }
 }
 
+function setScore(G, ctx, playerID, score) {
+  if (ctx.playerID === '0') {
+    // Only host can modify scores
+    const player = ctx.playOrder.find((p) => p === playerID);
+    if (player) {
+      G.scores = G.scores || {};
+      G.scores[playerID] = score;
+    }
+  }
+}
+
 export const Buzzer = {
   name: 'buzzer',
   minPlayers: 2,
@@ -96,6 +107,7 @@ export const Buzzer = {
         clearTextAnswers,
         incrementScore,
         decrementScore,
+        setScore,
       },
       turn: {
         activePlayers: ActivePlayers.ALL,

@@ -66,7 +66,14 @@ body {
   gap: 2rem;
 }
 
-.App header .room-id {
+.App header .header-info {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.App header .room-id,
+.App header .player-name {
   font-size: 1.1rem;
   font-weight: 500;
   color: var(--dimTextColor);
@@ -865,3 +872,54 @@ body {
 
 /* Header Sound Controls */
 /* Sound Control */
+
+/* Points Controls */
+.App .points-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.App .points-controls .point-button {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--lightBackgroundColor);
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.App .points-controls .point-button:hover:enabled {
+  background-color: var(--activeColor);
+  transform: translateY(-1px);
+}
+
+.App .points-controls .point-button:active:enabled {
+  transform: translateY(0);
+}
+
+.App .points-controls .point-button.reset {
+  width: auto;
+  border-radius: 15px;
+  padding: 0 12px;
+  margin-left: 4px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.App .points-controls .score {
+  min-width: 40px;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: var(--darkBlueColor);
+}

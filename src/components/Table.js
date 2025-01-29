@@ -156,9 +156,7 @@ export default function Table(game) {
       </button>
       <button
         className="point-button reset"
-        onClick={() => {
-          game.moves.decrementScore(id, (game.G.scores && game.G.scores[id]) || 0);
-        }}
+        onClick={() => game.moves.setScore(id, 0)}
         title="Reset points to 0"
       >
         Reset
