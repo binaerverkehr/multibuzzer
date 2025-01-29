@@ -136,42 +136,34 @@ export default function Table(game) {
   );
 
   const renderScoreControls = (id) => (
-    <>
-      <div 
-        className="score clickable" 
-        onClick={() => isHost && setShowScorePopup(id)}
-        title={isHost ? "Click to adjust score" : undefined}
+    <div className="points-controls">
+      <button
+        className="point-button"
+        onClick={() => game.moves.decrementScore(id)}
+        title="Decrease points by 1"
       >
+        -1
+      </button>
+      <div className="score">
         {(game.G.scores && game.G.scores[id]) || 0}
       </div>
-      {showScorePopup === id && (
-        <div className="score-popup">
-          <div className="score-display">
-            {(game.G.scores && game.G.scores[id]) || 0}
-          </div>
-          <div className="score-controls">
-            <button
-              className="score-button"
-              onClick={(e) => {
-                e?.stopPropagation();
-                game.moves.decrementScore(id);
-              }}
-            >
-              -
-            </button>
-            <button
-              className="score-button"
-              onClick={(e) => {
-                e?.stopPropagation();
-                game.moves.incrementScore(id);
-              }}
-            >
-              +
-            </button>
-          </div>
-        </div>
-      )}
-    </>
+      <button
+        className="point-button"
+        onClick={() => game.moves.incrementScore(id)}
+        title="Increase points by 1"
+      >
+        +1
+      </button>
+      <button
+        className="point-button reset"
+        onClick={() => {
+          game.moves.decrementScore(id, (game.G.scores && game.G.scores[id]) || 0);
+        }}
+        title="Reset points to 0"
+      >
+        Reset
+      </button>
+    </div>
   );
 
   return (
@@ -186,6 +178,7 @@ export default function Table(game) {
           })
         }
         roomID={game.gameID}
+        playerName={players.find(p => p.id === game.playerID)?.name}
       />
       <Container>
         {!game.isConnected && (
@@ -201,7 +194,7 @@ export default function Table(game) {
                 <th>Rank</th>
                 <th>Player</th>
                 <th>Points</th>
-                {isHost && <th>Actions</th>}
+                {isHost && <th>Points Control</th>}
               </tr>
             </thead>
             <tbody>
@@ -283,29 +276,34 @@ export default function Table(game) {
         ) : !game.G.textInputMode ? (
           <div className="game-section" role="region" aria-label="Buzzed players list">
             <h3>Players Buzzed ({buzzedPlayers.length})</h3>
-            <ul>
-              {buzzedPlayers.map(({ id, name, timestamp, connected }, i) => (
-                <li key={id} className={isHost ? 'resettable' : null}>
-                  <div
-                    className="player-sign"
+            <BootstrapTable striped bordered hover variant="dark">
+              <thead>
+                <tr>
+                  <th>Order</th>
+                  <th>Player</th>
+                  <th>Timing</th>
+                </tr>
+              </thead>
+              <tbody>
+                {buzzedPlayers.map(({ id, name, timestamp, connected }, i) => (
+                  <tr 
+                    key={id} 
+                    className={`${i === 0 ? 'first-buzz' : ''} ${!connected ? 'dim' : ''}`}
                     onClick={() => {
                       if (isHost) {
                         game.moves.resetBuzzer(id);
                       }
                     }}
                   >
-                    <div className="player-info">
-                      {renderPlayerName(id, name, connected)}
-                    </div>
-                    {i > 0 ? (
-                      <div className="mini">
-                        {timeDisplay(timestamp - queue[0].timestamp)}
-                      </div>
-                    ) : null}
-                  </div>
-                </li>
-              ))}
-            </ul>
+                    <td>{i + 1}</td>
+                    <td>{renderPlayerName(id, name, connected)}</td>
+                    <td>
+                      {i > 0 ? timeDisplay(timestamp - queue[0].timestamp) : 'First'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </BootstrapTable>
           </div>
         ) : null}
       </Container>
@@ -320,11 +318,7 @@ export default function Table(game) {
                 id="text-input-mode"
                 label={game.G.textInputMode ? "Texteingabe-Modus" : "Buzzer-Modus"}
                 checked={game.G.textInputMode}
-                onChange={() => {
-                  if (window.confirm('Switching modes will clear all current buzzes. Continue?')) {
-                    game.moves.toggleTextInputMode();
-                  }
-                }}
+                onChange={() => game.moves.toggleTextInputMode()}
                 aria-label="Toggle between text input and buzzer mode"
               />
             </div>
@@ -340,11 +334,7 @@ export default function Table(game) {
                 </button>
                 <button
                   className="text-button"
-                  onClick={() => {
-                    if (window.confirm('Are you sure you want to clear all answers?')) {
-                      game.moves.clearTextAnswers();
-                    }
-                  }}
+                  onClick={() => game.moves.clearTextAnswers()}
                   aria-label="Clear all text answers"
                   title="Remove all submitted answers"
                 >
@@ -366,11 +356,7 @@ export default function Table(game) {
                 <div className="button-container">
                   <button
                     disabled={isEmpty(game.G.queue)}
-                    onClick={() => {
-                      if (window.confirm('Are you sure you want to reset all buzzers?')) {
-                        game.moves.resetBuzzers();
-                      }
-                    }}
+                    onClick={() => game.moves.resetBuzzers()}
                     aria-label="Reset all buzzers"
                     title="Clear all current buzzes"
                   >

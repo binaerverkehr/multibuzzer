@@ -24,7 +24,8 @@ function Logo({ size = 25 }) {
 export default function Header({
   auth = {},
   clearAuth,
-  roomID
+  roomID,
+  playerName
 }) {
   const history = useHistory();
   const [playerSound, setPlayerSound] = useState(true);
@@ -49,11 +50,18 @@ export default function Header({
           <Navbar.Brand>
             <Logo /> Multibuzzer
           </Navbar.Brand>
-          {roomID && (
-            <div className="room-id">
-              Room: {roomID}
-            </div>
-          )}
+          <div className="header-info">
+            {roomID && (
+              <div className="room-id">
+                Room: {roomID}
+              </div>
+            )}
+            {playerName && (
+              <div className="player-name">
+                Player: {playerName}
+              </div>
+            )}
+          </div>
         </div>
         <div className="nav-buttons">
           <button
