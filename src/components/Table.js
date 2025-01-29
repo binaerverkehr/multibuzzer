@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { get, some, values, sortBy, orderBy, isEmpty, round } from 'lodash';
-import { Howl } from 'howler';
 import { AiOutlineDisconnect } from 'react-icons/ai';
-import { BsSoundwave, BsVolumeMute } from 'react-icons/bs';
-import { Container, Form } from 'react-bootstrap';
+import { Container, Form, Table as BootstrapTable } from 'react-bootstrap';
 import Header from '../components/Header';
 
 export default function Table(game) {
@@ -13,27 +11,9 @@ export default function Table(game) {
   );
   const [lastBuzz, setLastBuzz] = useState(null);
   const [showScorePopup, setShowScorePopup] = useState(null);
-  const [playerSound, setPlayerSound] = useState(true);
-  const [soundPlayed, setSoundPlayed] = useState(false);
   const [textAnswer, setTextAnswer] = useState('');
   const buzzButton = useRef(null);
   const queueRef = useRef(null);
-
-  const buzzSound = new Howl({
-    src: [
-      `${process.env.PUBLIC_URL}/shortBuzz.webm`,
-      `${process.env.PUBLIC_URL}/shortBuzz.mp3`,
-    ],
-    volume: 0.5,
-    rate: 1.5,
-  });
-
-  const playSound = () => {
-    if (playerSound && !soundPlayed) {
-      buzzSound.play();
-      setSoundPlayed(true);
-    }
-  };
 
   // Close score popup when clicking outside
   useEffect(() => {
@@ -64,13 +44,6 @@ export default function Table(game) {
       }
     }
 
-    // reset ability to play sound if there is no pending buzzer
-    if (isEmpty(game.G.queue)) {
-      setSoundPlayed(false);
-    } else if (loaded) {
-      playSound();
-    }
-
     if (!loaded) {
       setLoaded(true);
     }
@@ -80,7 +53,6 @@ export default function Table(game) {
 
   const attemptBuzz = () => {
     if (!buzzed) {
-      playSound();
       game.moves.buzz(game.playerID);
       setBuzzer(true);
       setLastBuzz(Date.now());
@@ -140,6 +112,13 @@ export default function Table(game) {
     ['desc', 'asc']
   );
 
+  // Sort all players by score for leaderboard
+  const allPlayersSorted = orderBy(
+    players,
+    [(p) => (game.G.scores && game.G.scores[p.id]) || 0],
+    ['desc']
+  );
+
   const timeDisplay = (delta) => {
     if (delta > 1000) {
       return `+${round(delta / 1000, 2)} s`;
@@ -153,19 +132,46 @@ export default function Table(game) {
         {name}
         {!connected && <AiOutlineDisconnect className="disconnected" />}
       </div>
-      {id === game.playerID && (
-        <div 
-          className="sound-toggle" 
-          onClick={(e) => {
-            e.stopPropagation();
-            setPlayerSound(!playerSound);
-          }}
-          title={playerSound ? "Turn off buzzer sound" : "Turn on buzzer sound"}
-        >
-          {playerSound ? <BsSoundwave /> : <BsVolumeMute />}
+    </div>
+  );
+
+  const renderScoreControls = (id) => (
+    <>
+      <div 
+        className="score clickable" 
+        onClick={() => isHost && setShowScorePopup(id)}
+        title={isHost ? "Click to adjust score" : undefined}
+      >
+        {(game.G.scores && game.G.scores[id]) || 0}
+      </div>
+      {showScorePopup === id && (
+        <div className="score-popup">
+          <div className="score-display">
+            {(game.G.scores && game.G.scores[id]) || 0}
+          </div>
+          <div className="score-controls">
+            <button
+              className="score-button"
+              onClick={(e) => {
+                e?.stopPropagation();
+                game.moves.decrementScore(id);
+              }}
+            >
+              -
+            </button>
+            <button
+              className="score-button"
+              onClick={(e) => {
+                e?.stopPropagation();
+                game.moves.incrementScore(id);
+              }}
+            >
+              +
+            </button>
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 
   return (
@@ -179,112 +185,58 @@ export default function Table(game) {
             roomID: null,
           })
         }
+        roomID={game.gameID}
       />
       <Container>
-        <section>
-          <p id="room-title">Room {game.gameID}</p>
-          {!game.isConnected ? (
-            <p className="warning">Disconnected - attempting to reconnect...</p>
-          ) : null}
-          <div className="sound-control">
-            <button
-              className={`sound-button ${playerSound ? 'active' : ''}`}
-              onClick={() => setPlayerSound(!playerSound)}
-              title={playerSound ? "Turn off buzzer sound" : "Turn on buzzer sound"}
-            >
-              {playerSound ? <BsSoundwave /> : <BsVolumeMute />}
-              {playerSound ? "Sound On" : "Sound Off"}
-            </button>
-          </div>
-          <div id="buzzer">
-            <button
-              ref={buzzButton}
-              disabled={buzzed || game.G.locked || game.G.textInputMode}
-              onClick={() => {
-                if (!buzzed && !game.G.locked && !game.G.textInputMode) {
-                  attemptBuzz();
-                }
-              }}
-              className={`${buzzed ? 'buzzed' : ''} ${game.G.locked ? 'locked' : ''}`}
-              aria-label={game.G.locked ? 'Buzzer locked' : buzzed ? 'Already buzzed' : 'Click to buzz'}
-              title={game.G.locked ? 'Buzzer is locked by host' : buzzed ? 'You have already buzzed' : 'Click or press spacebar to buzz'}
-            >
-              {game.G.locked ? 'Locked' : buzzed ? 'Buzzed' : 'Buzz'}
-            </button>
-          </div>
-          {isHost ? (
-            <div className="settings" role="group" aria-label="Host controls">
-              <div className="settings-grid">
-              <div className="button-container settings-item">
-                <Form.Check
-                  type="switch"
-                  id="text-input-mode"
-                  label="Text Input Mode"
-                  checked={game.G.textInputMode}
-                  onChange={() => {
-                    if (window.confirm('Switching modes will clear all current buzzes. Continue?')) {
-                      game.moves.toggleTextInputMode();
-                    }
-                  }}
-                  aria-label="Toggle text input mode"
-                />
-              </div>
-              {game.G.textInputMode ? (
-                <div className="button-container settings-item">
-                    <button
-                      className="text-button"
-                      onClick={() => game.moves.toggleTextInputLock()}
-                      aria-label={game.G.textInputLocked ? 'Unlock text answers' : 'Lock text answers'}
-                      title={game.G.textInputLocked ? 'Allow participants to submit answers' : 'Prevent new answer submissions'}
-                    >
-                    {game.G.textInputLocked ? 'Unlock answers' : 'Lock answers'}
-                  </button>
-                    <button
-                      className="text-button"
-                      onClick={() => {
-                        if (window.confirm('Are you sure you want to clear all answers?')) {
-                          game.moves.clearTextAnswers();
-                        }
-                      }}
-                      aria-label="Clear all text answers"
-                      title="Remove all submitted answers"
-                    >
-                    Clear answers
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <div className="button-container settings-item">
-                    <button
-                      className="text-button"
-                      onClick={() => game.moves.toggleLock()}
-                      aria-label={game.G.locked ? 'Unlock buzzers' : 'Lock buzzers'}
-                      title={game.G.locked ? 'Allow participants to buzz in' : 'Prevent new buzzes'}
-                    >
-                      {game.G.locked ? 'Unlock buzzers' : 'Lock buzzers'}
-                    </button>
-                  </div>
-                  <div className="button-container">
-                    <button
-                      disabled={isEmpty(game.G.queue)}
-                      onClick={() => {
-                        if (window.confirm('Are you sure you want to reset all buzzers?')) {
-                          game.moves.resetBuzzers();
-                        }
-                      }}
-                      aria-label="Reset all buzzers"
-                      title="Clear all current buzzes"
-                    >
-                      Reset all buzzers
-                    </button>
-                  </div>
-                </>
-              )}
-              </div>
+        {!game.isConnected && (
+          <p className="warning">Disconnected - attempting to reconnect...</p>
+        )}
+
+        {/* Leaderboard Section */}
+        <div className="game-section">
+          <h3>Leaderboard</h3>
+          <BootstrapTable striped bordered hover variant="dark">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Player</th>
+                <th>Points</th>
+                {isHost && <th>Actions</th>}
+              </tr>
+            </thead>
+            <tbody>
+              {allPlayersSorted.map(({ id, name, connected }, index) => (
+                <tr key={id} className={!connected ? 'dim' : ''}>
+                  <td>{index + 1}</td>
+                  <td>{renderPlayerName(id, name, connected)}</td>
+                  <td>{(game.G.scores && game.G.scores[id]) || 0}</td>
+                  {isHost && <td>{renderScoreControls(id)}</td>}
+                </tr>
+              ))}
+            </tbody>
+          </BootstrapTable>
+        </div>
+
+        {/* Buzzer/Input Section */}
+        <div className="game-section">
+          {!game.G.textInputMode ? (
+            <div id="buzzer">
+              <button
+                ref={buzzButton}
+                disabled={buzzed || game.G.locked}
+                onClick={() => {
+                  if (!buzzed && !game.G.locked) {
+                    attemptBuzz();
+                  }
+                }}
+                className={`${buzzed ? 'buzzed' : ''} ${game.G.locked ? 'locked' : ''}`}
+                aria-label={game.G.locked ? 'Buzzer locked' : buzzed ? 'Already buzzed' : 'Click to buzz'}
+                title={game.G.locked ? 'Buzzer is locked by host' : buzzed ? 'You have already buzzed' : 'Click or press spacebar to buzz'}
+              >
+                {game.G.locked ? 'Locked' : buzzed ? 'Buzzed' : 'Buzz'}
+              </button>
             </div>
-          ) : null}
-          
-          {game.G.textInputMode && !isHost ? (
+          ) : !isHost ? (
             <div className="text-input-container">
               <Form.Control
                 type="text"
@@ -307,10 +259,12 @@ export default function Table(game) {
               </button>
             </div>
           ) : null}
-        </section>
+        </div>
+
+        {/* Players Buzzed Section */}
         {game.G.textInputMode && isHost ? (
-          <div className="queue">
-            <p>Player Answers</p>
+          <div className="game-section">
+            <h3>Player Answers</h3>
             <ul>
               {players
                 .filter(p => p.connected)
@@ -321,42 +275,14 @@ export default function Table(game) {
                       <div className="answer">
                         {game.G.textAnswers[id] || '-'}
                       </div>
-                      <div 
-                        className="score clickable" 
-                        onClick={() => isHost && setShowScorePopup(id)}
-                        title={isHost ? "Click to adjust score" : undefined}
-                      >
-                        {(game.G.scores && game.G.scores[id]) || 0}
-                      </div>
-                      {showScorePopup === id && (
-                        <div className="score-popup">
-                          <div className="score-display">
-                            {(game.G.scores && game.G.scores[id]) || 0}
-                          </div>
-                          <div className="score-controls">
-                            <button
-                              className="score-button"
-                              onClick={() => game.moves.decrementScore(id)}
-                            >
-                              -
-                            </button>
-                            <button
-                              className="score-button"
-                              onClick={() => game.moves.incrementScore(id)}
-                            >
-                              +
-                            </button>
-                          </div>
-                        </div>
-                      )}
                     </div>
                   </li>
               ))}
             </ul>
           </div>
         ) : !game.G.textInputMode ? (
-          <div className="queue" role="region" aria-label="Buzzed players list">
-            <p>Players Buzzed ({buzzedPlayers.length})</p>
+          <div className="game-section" role="region" aria-label="Buzzed players list">
+            <h3>Players Buzzed ({buzzedPlayers.length})</h3>
             <ul>
               {buzzedPlayers.map(({ id, name, timestamp, connected }, i) => (
                 <li key={id} className={isHost ? 'resettable' : null}>
@@ -370,43 +296,6 @@ export default function Table(game) {
                   >
                     <div className="player-info">
                       {renderPlayerName(id, name, connected)}
-                      <div 
-                        className="score clickable" 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          isHost && setShowScorePopup(id);
-                        }}
-                        title={isHost ? "Click to adjust score" : undefined}
-                      >
-                        {(game.G.scores && game.G.scores[id]) || 0}
-                      </div>
-                      {showScorePopup === id && (
-                        <div className="score-popup">
-                          <div className="score-display">
-                            {(game.G.scores && game.G.scores[id]) || 0}
-                          </div>
-                          <div className="score-controls">
-                            <button
-                              className="score-button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                game.moves.decrementScore(id);
-                              }}
-                            >
-                              -
-                            </button>
-                            <button
-                              className="score-button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                game.moves.incrementScore(id);
-                              }}
-                            >
-                              +
-                            </button>
-                          </div>
-                        </div>
-                      )}
                     </div>
                     {i > 0 ? (
                       <div className="mini">
@@ -419,47 +308,80 @@ export default function Table(game) {
             </ul>
           </div>
         ) : null}
-          <div className="queue" role="region" aria-label="Other players list">
-            <p>Other Players ({activePlayers.length})</p>
-          <ul>
-            {activePlayers.map(({ id, name, connected }) => (
-              <li key={id}>
-                <div className="player-info">
-                  {renderPlayerName(id, name, connected)}
-                  <div 
-                    className="score clickable" 
-                    onClick={() => isHost && setShowScorePopup(id)}
-                    title={isHost ? "Click to adjust score" : undefined}
-                  >
-                    {(game.G.scores && game.G.scores[id]) || 0}
-                  </div>
-                  {showScorePopup === id && (
-                    <div className="score-popup">
-                      <div className="score-display">
-                        {(game.G.scores && game.G.scores[id]) || 0}
-                      </div>
-                      <div className="score-controls">
-                        <button
-                          className="score-button"
-                          onClick={() => game.moves.decrementScore(id)}
-                        >
-                          -
-                        </button>
-                        <button
-                          className="score-button"
-                          onClick={() => game.moves.incrementScore(id)}
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
       </Container>
+
+      {/* Host Administration Panel */}
+      {isHost && (
+        <div className="admin-panel">
+          <div className="settings-grid">
+            <div className="button-container settings-item">
+              <Form.Check
+                type="switch"
+                id="text-input-mode"
+                label={game.G.textInputMode ? "Texteingabe-Modus" : "Buzzer-Modus"}
+                checked={game.G.textInputMode}
+                onChange={() => {
+                  if (window.confirm('Switching modes will clear all current buzzes. Continue?')) {
+                    game.moves.toggleTextInputMode();
+                  }
+                }}
+                aria-label="Toggle between text input and buzzer mode"
+              />
+            </div>
+            {game.G.textInputMode ? (
+              <div className="button-container settings-item">
+                <button
+                  className="text-button"
+                  onClick={() => game.moves.toggleTextInputLock()}
+                  aria-label={game.G.textInputLocked ? 'Unlock text answers' : 'Lock text answers'}
+                  title={game.G.textInputLocked ? 'Allow participants to submit answers' : 'Prevent new answer submissions'}
+                >
+                  {game.G.textInputLocked ? 'Unlock answers' : 'Lock answers'}
+                </button>
+                <button
+                  className="text-button"
+                  onClick={() => {
+                    if (window.confirm('Are you sure you want to clear all answers?')) {
+                      game.moves.clearTextAnswers();
+                    }
+                  }}
+                  aria-label="Clear all text answers"
+                  title="Remove all submitted answers"
+                >
+                  Clear answers
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="button-container settings-item">
+                  <button
+                    className="text-button"
+                    onClick={() => game.moves.toggleLock()}
+                    aria-label={game.G.locked ? 'Unlock buzzers' : 'Lock buzzers'}
+                    title={game.G.locked ? 'Allow participants to buzz in' : 'Prevent new buzzes'}
+                  >
+                    {game.G.locked ? 'Unlock buzzers' : 'Lock buzzers'}
+                  </button>
+                </div>
+                <div className="button-container">
+                  <button
+                    disabled={isEmpty(game.G.queue)}
+                    onClick={() => {
+                      if (window.confirm('Are you sure you want to reset all buzzers?')) {
+                        game.moves.resetBuzzers();
+                      }
+                    }}
+                    aria-label="Reset all buzzers"
+                    title="Clear all current buzzes"
+                  >
+                    Reset all buzzers
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

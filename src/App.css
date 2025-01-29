@@ -56,14 +56,33 @@ body {
 
 .App header nav {
   justify-content: space-between;
+  border-bottom: 1px solid var(--activeColor);
+  padding: 0.5rem 1rem;
+}
+
+.App header .navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.App header .room-id {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--dimTextColor);
+  padding: 0.25rem 1rem;
+  background-color: var(--darkBlueColor);
+  border-radius: 6px;
 }
 
 .App header svg {
   margin-right: 10px;
 }
 
-.App header .nav-buttons > :not(:first-child) {
-  margin-left: 5px;
+.App header .nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 /* BUTTON */
@@ -256,10 +275,104 @@ body {
 .App #game .container {
   text-align: center;
   margin-top: 20px;
+  padding-bottom: 120px; /* Space for admin panel */
+  max-width: 1200px;
 }
 
-.App #room-title {
-  margin-bottom: 0px;
+/* Game sections */
+.App .game-section {
+  background-color: var(--darkBlueColor);
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--activeColor);
+}
+
+.App .game-section h3 {
+  color: var(--dimTextColor);
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.App .game-section h3::before,
+.App .game-section h3::after {
+  content: '';
+  height: 1px;
+  background-color: var(--activeColor);
+  flex: 1;
+  max-width: 100px;
+}
+
+/* Admin Panel */
+.App .admin-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--darkBlueColor);
+  border-top: 1px solid var(--activeColor);
+  padding: 1rem;
+  z-index: 1000;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.App .admin-panel .settings-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: transparent;
+  box-shadow: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.App .admin-panel .button-container {
+  display: flex;
+  gap: 10px;
+}
+
+.App .admin-panel .text-button {
+  background-color: var(--lightBackgroundColor);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.App .admin-panel .text-button:hover:enabled {
+  background-color: var(--activeColor);
+  transform: translateY(-1px);
+}
+
+.App .admin-panel .text-button:active:enabled {
+  transform: translateY(0);
+}
+
+.App .admin-panel .form-check {
+  margin: 0;
+  padding: 10px 15px;
+}
+
+@media screen and (max-width: 767px) {
+  .App .game-section {
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+
+  .App .admin-panel {
+    padding: 0.75rem;
+  }
+
+  .App .admin-panel .settings-grid {
+    gap: 10px;
+  }
 }
 
 .App .sound-control {

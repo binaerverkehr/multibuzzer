@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Navbar } from 'react-bootstrap';
-import { isNil } from 'lodash';
 import { useHistory } from 'react-router';
 import { leaveRoom } from '../lib/endpoints';
 import { BsSoundwave, BsVolumeMute } from 'react-icons/bs';
@@ -25,12 +24,10 @@ function Logo({ size = 25 }) {
 export default function Header({
   auth = {},
   clearAuth,
-  sound = null,
-  setSound,
+  roomID
 }) {
   const history = useHistory();
-  const [volume, setVolume] = useState(50);
-  const [showVolume, setShowVolume] = useState(false);
+  const [playerSound, setPlayerSound] = useState(true);
 
   // leave current game
   async function leave() {
@@ -45,49 +42,27 @@ export default function Header({
     }
   }
 
-  const handleVolumeChange = (e) => {
-    const newVolume = parseInt(e.target.value);
-    setVolume(newVolume);
-    // Here you would typically update the Howler volume
-    // This will be handled by the parent component
-    if (setSound) {
-      setSound(newVolume / 100);
-    }
-  };
-
   return (
     <header>
       <Navbar>
-        <Navbar.Brand>
-          <Logo /> Multibuzzer
-        </Navbar.Brand>
-        <div className="nav-buttons">
-          {!isNil(sound) && (
-            <div className="sound-controls">
-              <button 
-                className="text-button sound-button" 
-                onClick={() => setShowVolume(!showVolume)}
-                aria-label={sound ? 'Sound enabled' : 'Sound disabled'}
-                title="Toggle sound settings"
-              >
-                {sound ? <BsSoundwave /> : <BsVolumeMute />}
-              </button>
-              {showVolume && (
-                <div className="volume-slider">
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={volume}
-                    onChange={handleVolumeChange}
-                    className="volume-range"
-                    aria-label="Volume control"
-                  />
-                  <span className="volume-value">{volume}%</span>
-                </div>
-              )}
+        <div className="navbar-left">
+          <Navbar.Brand>
+            <Logo /> Multibuzzer
+          </Navbar.Brand>
+          {roomID && (
+            <div className="room-id">
+              Room: {roomID}
             </div>
           )}
+        </div>
+        <div className="nav-buttons">
+          <button
+            className={`text-button sound-button ${playerSound ? 'active' : ''}`}
+            onClick={() => setPlayerSound(!playerSound)}
+            title={playerSound ? "Sound On" : "Sound Off"}
+          >
+            {playerSound ? <BsSoundwave /> : <BsVolumeMute />}
+          </button>
           {clearAuth && (
             <button 
               className="text-button" 
