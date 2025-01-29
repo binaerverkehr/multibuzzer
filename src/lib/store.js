@@ -18,6 +18,7 @@ function toggleTextInputMode(G) {
   G.textInputMode = !G.textInputMode;
   // Reset text answers when toggling mode
   G.textAnswers = {};
+  G.answerVisibility = {};
 }
 
 function toggleTextInputLock(G) {
@@ -35,6 +36,7 @@ function submitTextAnswer(G, ctx, playerID, answer) {
 
 function clearTextAnswers(G) {
   G.textAnswers = {};
+  G.answerVisibility = {};
 }
 
 function buzz(G, ctx, id) {
@@ -81,6 +83,20 @@ function setScore(G, ctx, playerID, score) {
   }
 }
 
+function toggleHostVisibility(G) {
+  G.hideHost = !G.hideHost;
+}
+
+function toggleAnswerVisibility(G, ctx, playerID) {
+  if (ctx.playerID === '0') {
+    // Only host can toggle answer visibility
+    G.answerVisibility = {
+      ...G.answerVisibility,
+      [playerID]: !G.answerVisibility[playerID]
+    };
+  }
+}
+
 export const Buzzer = {
   name: 'buzzer',
   minPlayers: 2,
@@ -92,6 +108,8 @@ export const Buzzer = {
     textInputMode: false,
     textInputLocked: false,
     textAnswers: {},
+    hideHost: true,
+    answerVisibility: {},
   }),
   phases: {
     play: {
@@ -108,6 +126,8 @@ export const Buzzer = {
         incrementScore,
         decrementScore,
         setScore,
+        toggleHostVisibility,
+        toggleAnswerVisibility,
       },
       turn: {
         activePlayers: ActivePlayers.ALL,

@@ -8,11 +8,13 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  padding: 2rem;
 }
 
 .App #lobby-right {
   flex-grow: 60;
   flex-basis: 480px;
+  padding: 2rem;
 }
 
 /* Touts Section */
@@ -24,10 +26,40 @@
   font-weight: 500;
   font-size: 1.2rem;
   line-height: 140%;
+  margin-bottom: 1rem;
 }
 
 .App .touts p {
   color: var(--paragraphColor);
   line-height: 140%;
   font-size: 1rem;
+}
+
+/* Container Spacing */
+.container-half {
+  padding: 1rem;
+}
+
+.container-mobile {
+  padding: 2rem 1rem;
+}
+
+/* Form Spacing */
+.lobby-form {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.lobby-form h3 {
+  margin-bottom: 2rem;
+}
+
+.lobby-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.divider {
+  margin: 2rem 0;
+  border-top: 1px solid var(--borderColor);
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { get, some, values, sortBy, orderBy, isEmpty, round } from 'lodash';
 import { AiOutlineDisconnect } from 'react-icons/ai';
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { Container, Form, Table as BootstrapTable } from 'react-bootstrap';
 import Header from '../components/Header';
 
@@ -12,7 +13,6 @@ export default function Table(game) {
   const [lastBuzz, setLastBuzz] = useState(null);
   const [showScorePopup, setShowScorePopup] = useState(null);
   const [textAnswer, setTextAnswer] = useState('');
-  const [hideHost, setHideHost] = useState(true);
   const buzzButton = useRef(null);
   const queueRef = useRef(null);
   const lastQueueLength = useRef(0);
@@ -125,7 +125,7 @@ export default function Table(game) {
       };
     })
     .filter((p) => p.name)
-    .filter((p) => !hideHost || p.id !== hostId);
+    .filter((p) => !game.G.hideHost || p.id !== hostId);
   // active players who haven't buzzed
   const activePlayers = orderBy(
     players.filter((p) => !some(queue, (q) => q.id === p.id)),
@@ -135,7 +135,7 @@ export default function Table(game) {
 
   // Sort all players by score for leaderboard
   const allPlayersSorted = orderBy(
-    players.filter(p => !hideHost || p.id !== hostId),
+    players.filter(p => !game.G.hideHost || p.id !== hostId),
     [(p) => (game.G.scores && game.G.scores[p.id]) || 0],
     ['desc']
   );
@@ -185,6 +185,54 @@ export default function Table(game) {
     </div>
   );
 
+  const renderPlayerAnswers = () => {
+    const connectedPlayers = players
+      .filter(p => p.connected)
+      .filter(p => !game.G.hideHost || p.id !== hostId);
+
+    return (
+      <div className="game-section">
+        <h3>Player Answers</h3>
+        <BootstrapTable striped bordered hover variant="dark">
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Player</th>
+              <th>Answer</th>
+              {isHost && <th>Visibility</th>}
+            </tr>
+          </thead>
+          <tbody>
+            {connectedPlayers.map(({ id, name }, index) => {
+              const answer = game.G.textAnswers[id];
+              const isVisible = game.G.answerVisibility[id];
+              const showAnswer = isHost || id === game.playerID || isVisible;
+
+              return (
+                <tr key={id}>
+                  <td>{index + 1}</td>
+                  <td>{renderPlayerName(id, name, true)}</td>
+                  <td>{showAnswer ? (answer || '-') : '***'}</td>
+                  {isHost && (
+                    <td>
+                      <button
+                        className="visibility-toggle"
+                        onClick={() => game.moves.toggleAnswerVisibility(id)}
+                        title={isVisible ? "Hide answer from participants" : "Show answer to participants"}
+                      >
+                        {isVisible ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+                      </button>
+                    </td>
+                  )}
+                </tr>
+              );
+            })}
+          </tbody>
+        </BootstrapTable>
+      </div>
+    );
+  };
+
   return (
     <div>
       <Header
@@ -232,26 +280,9 @@ export default function Table(game) {
         {/* Game Sections Grid */}
         <div className="game-sections-grid">
           {/* Players Buzzed Section */}
-          {game.G.textInputMode && isHost ? (
-            <div className="game-section">
-              <h3>Player Answers</h3>
-              <ul>
-                {players
-                  .filter(p => p.connected)
-                  .filter(p => !hideHost || p.id !== hostId)
-                  .map(({ id, name }) => (
-                    <li key={id}>
-                      <div className="player-info">
-                        {renderPlayerName(id, name, true)}
-                        <div className="answer">
-                          {game.G.textAnswers[id] || '-'}
-                        </div>
-                      </div>
-                    </li>
-                ))}
-              </ul>
-            </div>
-          ) : !game.G.textInputMode ? (
+          {game.G.textInputMode ? (
+            renderPlayerAnswers()
+          ) : (
             <div className="game-section" role="region" aria-label="Buzzed players list">
               <h3>Players Buzzed ({buzzedPlayers.length})</h3>
               <BootstrapTable striped bordered hover variant="dark">
@@ -283,7 +314,7 @@ export default function Table(game) {
                 </tbody>
               </BootstrapTable>
             </div>
-          ) : null}
+          )}
 
           {/* Buzzer/Input Section */}
           <div className="game-section">
@@ -351,8 +382,8 @@ export default function Table(game) {
               <Form.Check
                 type="switch"
                 id="show-host"
-                checked={!hideHost}
-                onChange={() => setHideHost(!hideHost)}
+                checked={!game.G.hideHost}
+                onChange={() => game.moves.toggleHostVisibility()}
                 aria-label="Toggle host visibility in lists"
               />
             </div>

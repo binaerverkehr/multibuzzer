@@ -1,91 +1,96 @@
 @import '../variables.css';
 
-.container-half {
-  width: 100%;
-  max-width: 375px;
-  padding-right: 40px;
-  padding-left: 40px;
+.container {
+  padding: 2rem 1rem 100px;
 }
 
-@media screen and (max-width: 991px) {
-  .container-half {
-    max-width: 350px;
-  }
-}
-
-.App #lobby-left .container-half {
-  margin-left: auto;
-  margin-top: 100px;
-  padding-right: 60px;
-}
-
-.App #lobby-right .container-half {
-  margin-right: auto;
-  margin-top: 160px;
-  padding-left: 60px;
-}
-
-.App #lobby .container-mobile {
-  margin-top: 40px;
-  padding: 0 30px;
-  max-width: 400px;
-}
-
-.App #game .container-loading {
-  margin-top: 80px;
-  text-align: center;
-}
-
-.App #game .container {
-  text-align: center;
-  margin-top: 20px;
-  padding-bottom: 120px; /* Space for admin panel */
-  max-width: 1200px;
-}
-
-/* Game sections */
-.App .game-sections-grid {
-  display: grid;
-  grid-template-columns: 60% 40%;
-  gap: 25px;
-  margin-bottom: 25px;
-}
-
-.App .game-section {
-  background-color: var(--darkBlueColor);
-  border-radius: 12px;
-  padding: 25px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border: 1px solid var(--activeColor);
-  height: 100%;
-}
-
-.App .game-section h3 {
-  color: var(--dimTextColor);
-  font-size: 1.2rem;
-  margin-bottom: 1.5rem;
-  font-weight: 500;
+.container-loading {
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  align-items: center;
+  min-height: 300px;
 }
 
-.App .game-section h3::before,
-.App .game-section h3::after {
-  content: '';
-  height: 1px;
-  background-color: var(--activeColor);
+.game-sections-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+  padding: 0 1rem;
+}
+
+.game-section {
+  background-color: var(--darkBackgroundColor);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.game-section h3 {
+  margin-bottom: 1rem;
+  color: var(--textColor);
+}
+
+.game-section table {
+  margin-bottom: 0;
+}
+
+.game-section #buzzer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   flex: 1;
-  max-width: 100px;
+  min-height: 300px;
+}
+
+.text-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.text-input-container input {
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid var(--borderColor);
+  background-color: var(--inputBackgroundColor);
+  color: var(--textColor);
+}
+
+.text-input-container button {
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: none;
+  background-color: var(--brightBlueColor);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.text-input-container button:hover:not(:disabled) {
+  background-color: var(--hoverBlueColor);
+}
+
+.text-input-container button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 @media screen and (max-width: 767px) {
-  .App .game-sections-grid {
+  .game-sections-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0 0.5rem;
   }
 
-  .App .game-section {
-    padding: 15px;
+  .game-section {
+    padding: 1rem;
+  }
+
+  .container {
+    padding: 1rem 0.5rem 100px;
   }
 }

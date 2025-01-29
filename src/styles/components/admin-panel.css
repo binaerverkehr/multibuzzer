@@ -1,123 +1,92 @@
 @import '../variables.css';
 
-/* Admin Panel */
-.App .admin-panel {
+.admin-panel {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: var(--darkBlueColor);
-  border-top: 1px solid var(--activeColor);
+  background-color: var(--darkBackgroundColor);
   padding: 1rem;
-  z-index: 1000;
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 100;
 }
 
-.App .admin-panel .settings-grid {
-  max-width: 1200px;
-  margin: 0 auto;
-  background-color: transparent;
-  box-shadow: none;
-  padding: 0;
+.settings-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
+  gap: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.App .admin-panel .button-container {
+.settings-item {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
 }
 
-.App .admin-panel .text-button {
-  background-color: var(--lightBackgroundColor);
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.button-container button {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: none;
+  background-color: var(--brightBlueColor);
   color: white;
-  padding: 10px 15px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
 }
 
-.App .admin-panel .text-button:hover:enabled {
-  background-color: var(--activeColor);
-  transform: translateY(-1px);
+.button-container button:hover:not(:disabled) {
+  background-color: var(--hoverBlueColor);
 }
 
-.App .admin-panel .text-button:active:enabled {
-  transform: translateY(0);
-}
-
-/* Settings */
-.App .settings {
-  margin: 30px auto;
-  max-width: 600px;
-}
-
-.App .settings-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  padding: 20px;
-  background-color: var(--darkBlueColor);
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.App .settings-item {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.App .settings button {
-  width: 100%;
-  padding: 12px;
-  font-size: 1rem;
-  transition: all 0.2s ease;
-}
-
-.App .settings button.text-button {
-  background-color: var(--lightBackgroundColor);
-  padding: 12px;
-  border-radius: 8px;
-  font-weight: 500;
-}
-
-.App .settings button.text-button:hover:enabled {
-  background-color: var(--activeColor);
-  transform: translateY(-1px);
-}
-
-.App .settings button.text-button:active:enabled {
-  transform: translateY(0);
-}
-
-.App .settings button:disabled {
-  opacity: 0.7;
+.button-container button:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-@media screen and (max-width: 767px) {
-  .App .admin-panel {
-    padding: 0.75rem;
-  }
-
-  .App .admin-panel .settings-grid {
-    gap: 10px;
-  }
+.text-button {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: none;
+  background-color: var(--brightBlueColor);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
 }
 
-@media screen and (max-width: 480px) {
-  .App .settings {
-    margin: 20px 10px;
-  }
-  
-  .App .settings-grid {
-    padding: 15px;
-    gap: 15px;
-  }
-  
-  .App .settings button {
-    padding: 10px;
-    font-size: 0.9rem;
-  }
+.text-button:hover:not(:disabled) {
+  background-color: var(--hoverBlueColor);
+}
+
+.text-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.visibility-toggle {
+  background: none;
+  border: none;
+  color: var(--brightBlueColor);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease-in-out;
+}
+
+.visibility-toggle:hover {
+  color: var(--hoverBlueColor);
+}
+
+.visibility-toggle svg {
+  width: 20px;
+  height: 20px;
 }
