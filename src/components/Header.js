@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar } from 'react-bootstrap';
 import { useHistory } from 'react-router';
 import { leaveRoom } from '../lib/endpoints';
@@ -28,7 +28,15 @@ export default function Header({
   playerName
 }) {
   const history = useHistory();
-  const [playerSound, setPlayerSound] = useState(true);
+  const [playerSound, setPlayerSound] = useState(() => {
+    const savedSound = localStorage.getItem('playerSound');
+    return savedSound === null ? true : savedSound === 'true';
+  });
+
+  // Save sound preference to localStorage
+  useEffect(() => {
+    localStorage.setItem('playerSound', playerSound);
+  }, [playerSound]);
 
   // leave current game
   async function leave() {

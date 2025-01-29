@@ -12,8 +12,10 @@ export default function Table(game) {
   const [lastBuzz, setLastBuzz] = useState(null);
   const [showScorePopup, setShowScorePopup] = useState(null);
   const [textAnswer, setTextAnswer] = useState('');
+  const [hideHost, setHideHost] = useState(true);
   const buzzButton = useRef(null);
   const queueRef = useRef(null);
+  const lastQueueLength = useRef(0);
 
   // Close score popup when clicking outside
   useEffect(() => {
@@ -25,6 +27,23 @@ export default function Table(game) {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showScorePopup]);
+
+  // Play sound when someone buzzes
+  useEffect(() => {
+    const currentQueueLength = Object.keys(game.G.queue).length;
+    const savedSound = localStorage.getItem('playerSound');
+    const soundEnabled = savedSound === null ? true : savedSound === 'true';
+
+    // Only play sound when queue length increases (new buzz)
+    if (currentQueueLength > lastQueueLength.current && soundEnabled) {
+      const audio = new Audio('/shortBuzz.mp3');
+      audio.volume = 0.3;
+      audio.play().catch(error => {
+        console.log('Audio play error:', error);
+      });
+    }
+    lastQueueLength.current = currentQueueLength;
+  }, [game.G.queue]);
 
   useEffect(() => {
     console.log(game.G.queue, Date.now());
@@ -90,6 +109,7 @@ export default function Table(game) {
       '0'
     ) || null;
   const isHost = get(firstPlayer, 'id') === game.playerID;
+  const hostId = get(firstPlayer, 'id');
 
   const queue = sortBy(values(game.G.queue), ['timestamp']);
   const buzzedPlayers = queue
@@ -104,7 +124,8 @@ export default function Table(game) {
         connected: player.connected,
       };
     })
-    .filter((p) => p.name);
+    .filter((p) => p.name)
+    .filter((p) => !hideHost || p.id !== hostId);
   // active players who haven't buzzed
   const activePlayers = orderBy(
     players.filter((p) => !some(queue, (q) => q.id === p.id)),
@@ -114,7 +135,7 @@ export default function Table(game) {
 
   // Sort all players by score for leaderboard
   const allPlayersSorted = orderBy(
-    players,
+    players.filter(p => !hideHost || p.id !== hostId),
     [(p) => (game.G.scores && game.G.scores[p.id]) || 0],
     ['desc']
   );
@@ -208,116 +229,131 @@ export default function Table(game) {
           </BootstrapTable>
         </div>
 
-        {/* Buzzer/Input Section */}
-        <div className="game-section">
-          {!game.G.textInputMode ? (
-            <div id="buzzer">
-              <button
-                ref={buzzButton}
-                disabled={buzzed || game.G.locked}
-                onClick={() => {
-                  if (!buzzed && !game.G.locked) {
-                    attemptBuzz();
-                  }
-                }}
-                className={`${buzzed ? 'buzzed' : ''} ${game.G.locked ? 'locked' : ''}`}
-                aria-label={game.G.locked ? 'Buzzer locked' : buzzed ? 'Already buzzed' : 'Click to buzz'}
-                title={game.G.locked ? 'Buzzer is locked by host' : buzzed ? 'You have already buzzed' : 'Click or press spacebar to buzz'}
-              >
-                {game.G.locked ? 'Locked' : buzzed ? 'Buzzed' : 'Buzz'}
-              </button>
+        {/* Game Sections Grid */}
+        <div className="game-sections-grid">
+          {/* Players Buzzed Section */}
+          {game.G.textInputMode && isHost ? (
+            <div className="game-section">
+              <h3>Player Answers</h3>
+              <ul>
+                {players
+                  .filter(p => p.connected)
+                  .filter(p => !hideHost || p.id !== hostId)
+                  .map(({ id, name }) => (
+                    <li key={id}>
+                      <div className="player-info">
+                        {renderPlayerName(id, name, true)}
+                        <div className="answer">
+                          {game.G.textAnswers[id] || '-'}
+                        </div>
+                      </div>
+                    </li>
+                ))}
+              </ul>
             </div>
-          ) : !isHost ? (
-            <div className="text-input-container">
-              <Form.Control
-                type="text"
-                placeholder="Enter your answer..."
-                value={textAnswer}
-                onChange={(e) => setTextAnswer(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter' && !game.G.textInputLocked) {
-                    game.moves.submitTextAnswer(game.playerID, textAnswer);
-                  }
-                }}
-                disabled={game.G.textInputLocked}
-              />
-              <button
-                className="submit-answer"
-                disabled={game.G.textInputLocked || !textAnswer.trim()}
-                onClick={() => game.moves.submitTextAnswer(game.playerID, textAnswer)}
-              >
-                Submit Answer
-              </button>
+          ) : !game.G.textInputMode ? (
+            <div className="game-section" role="region" aria-label="Buzzed players list">
+              <h3>Players Buzzed ({buzzedPlayers.length})</h3>
+              <BootstrapTable striped bordered hover variant="dark">
+                <thead>
+                  <tr>
+                    <th>Order</th>
+                    <th>Player</th>
+                    <th>Timing</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {buzzedPlayers.map(({ id, name, timestamp, connected }, i) => (
+                    <tr 
+                      key={id} 
+                      className={`${i === 0 ? 'first-buzz' : ''} ${!connected ? 'dim' : ''}`}
+                      onClick={() => {
+                        if (isHost) {
+                          game.moves.resetBuzzer(id);
+                        }
+                      }}
+                    >
+                      <td>{i + 1}</td>
+                      <td>{renderPlayerName(id, name, connected)}</td>
+                      <td>
+                        {i > 0 ? timeDisplay(timestamp - queue[0].timestamp) : 'First'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </BootstrapTable>
             </div>
           ) : null}
-        </div>
 
-        {/* Players Buzzed Section */}
-        {game.G.textInputMode && isHost ? (
+          {/* Buzzer/Input Section */}
           <div className="game-section">
-            <h3>Player Answers</h3>
-            <ul>
-              {players
-                .filter(p => p.connected)
-                .map(({ id, name }) => (
-                  <li key={id}>
-                    <div className="player-info">
-                      {renderPlayerName(id, name, true)}
-                      <div className="answer">
-                        {game.G.textAnswers[id] || '-'}
-                      </div>
-                    </div>
-                  </li>
-              ))}
-            </ul>
+            {!game.G.textInputMode ? (
+              <div id="buzzer">
+                <button
+                  ref={buzzButton}
+                  disabled={buzzed || game.G.locked}
+                  onClick={() => {
+                    if (!buzzed && !game.G.locked) {
+                      attemptBuzz();
+                    }
+                  }}
+                  className={`${buzzed ? 'buzzed' : ''} ${game.G.locked ? 'locked' : ''}`}
+                  aria-label={game.G.locked ? 'Buzzer locked' : buzzed ? 'Already buzzed' : 'Click to buzz'}
+                  title={game.G.locked ? 'Buzzer is locked by host' : buzzed ? 'You have already buzzed' : 'Click or press spacebar to buzz'}
+                >
+                  {game.G.locked ? 'Locked' : buzzed ? 'Buzzed' : 'Buzz'}
+                </button>
+              </div>
+            ) : !isHost ? (
+              <div className="text-input-container">
+                <Form.Control
+                  type="text"
+                  placeholder="Enter your answer..."
+                  value={textAnswer}
+                  onChange={(e) => setTextAnswer(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter' && !game.G.textInputLocked) {
+                      game.moves.submitTextAnswer(game.playerID, textAnswer);
+                    }
+                  }}
+                  disabled={game.G.textInputLocked}
+                />
+                <button
+                  className="submit-answer"
+                  disabled={game.G.textInputLocked || !textAnswer.trim()}
+                  onClick={() => game.moves.submitTextAnswer(game.playerID, textAnswer)}
+                >
+                  Submit Answer
+                </button>
+              </div>
+            ) : null}
           </div>
-        ) : !game.G.textInputMode ? (
-          <div className="game-section" role="region" aria-label="Buzzed players list">
-            <h3>Players Buzzed ({buzzedPlayers.length})</h3>
-            <BootstrapTable striped bordered hover variant="dark">
-              <thead>
-                <tr>
-                  <th>Order</th>
-                  <th>Player</th>
-                  <th>Timing</th>
-                </tr>
-              </thead>
-              <tbody>
-                {buzzedPlayers.map(({ id, name, timestamp, connected }, i) => (
-                  <tr 
-                    key={id} 
-                    className={`${i === 0 ? 'first-buzz' : ''} ${!connected ? 'dim' : ''}`}
-                    onClick={() => {
-                      if (isHost) {
-                        game.moves.resetBuzzer(id);
-                      }
-                    }}
-                  >
-                    <td>{i + 1}</td>
-                    <td>{renderPlayerName(id, name, connected)}</td>
-                    <td>
-                      {i > 0 ? timeDisplay(timestamp - queue[0].timestamp) : 'First'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </BootstrapTable>
-          </div>
-        ) : null}
+        </div>
       </Container>
 
       {/* Host Administration Panel */}
       {isHost && (
         <div className="admin-panel">
           <div className="settings-grid">
-            <div className="button-container settings-item">
+            <div className="mode-switch-container">
+              <span className="mode-label">Eingabe-Modus</span>
               <Form.Check
                 type="switch"
                 id="text-input-mode"
-                label={game.G.textInputMode ? "Texteingabe-Modus" : "Buzzer-Modus"}
                 checked={game.G.textInputMode}
                 onChange={() => game.moves.toggleTextInputMode()}
                 aria-label="Toggle between text input and buzzer mode"
+              />
+              <span className="mode-label">Buzzer-Modus</span>
+            </div>
+            <div className="mode-switch-container">
+              <span className="mode-label">Host anzeigen</span>
+              <Form.Check
+                type="switch"
+                id="show-host"
+                checked={!hideHost}
+                onChange={() => setHideHost(!hideHost)}
+                aria-label="Toggle host visibility in lists"
               />
             </div>
             {game.G.textInputMode ? (
