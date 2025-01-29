@@ -55,14 +55,16 @@
 }
 
 /* Text Input Styles */
+.text-input-container,
 .App .text-input-container {
-  margin: 20px auto;
-  max-width: 500px;
+  /*margin: 20px auto;*/
+  max-width: 800px;
   display: flex;
-  gap: 10px;
+  gap: 15px;
   align-items: center;
 }
 
+.text-input-container input,
 .App .text-input-container input {
   flex: 1;
   padding: 10px;
@@ -73,12 +75,14 @@
   color: white;
 }
 
+.text-input-container input:disabled,
 .App .text-input-container input:disabled {
   background-color: var(--lightBackgroundColor);
   border-color: var(--disabledTextColor);
   color: var(--disabledTextColor);
 }
 
+.text-input-container .submit-answer,
 .App .text-input-container .submit-answer {
   white-space: nowrap;
   background-color: var(--brightBlueColor);
@@ -86,10 +90,12 @@
   padding: 10px 20px;
 }
 
+.text-input-container .submit-answer:disabled,
 .App .text-input-container .submit-answer:disabled {
   background-color: var(--disabledBlueColor);
 }
 
+.text-input-container .submit-answer:hover:enabled,
 .App .text-input-container .submit-answer:hover:enabled {
   background-color: var(--hoverBlueColor);
 }
