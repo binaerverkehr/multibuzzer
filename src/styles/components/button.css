@@ -1,0 +1,108 @@
+@import '../variables.css';
+
+.App button {
+  background: none;
+  font-weight: 700;
+  color: white;
+  padding: 8px 10px;
+  border-radius: 4px;
+  border: solid 1px white;
+}
+
+.App button:disabled {
+  border-color: var(--disabledTextColor);
+  color: var(--disabledTextColor);
+}
+
+.App button:hover:enabled {
+  background-color: var(--lightBackgroundColor);
+}
+
+.App button:focus:enabled {
+  outline: none;
+}
+
+.App button.text-button {
+  font-weight: 500;
+  color: var(--dimTextColor);
+  border: none;
+}
+
+.App button.text-button:hover {
+  color: white;
+}
+
+/* Points Controls */
+.App .points-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.App .points-controls .point-button {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--lightBackgroundColor);
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.App .points-controls .point-button:hover:enabled {
+  background-color: var(--activeColor);
+  transform: translateY(-1px);
+}
+
+.App .points-controls .point-button:active:enabled {
+  transform: translateY(0);
+}
+
+.App .points-controls .point-button.reset {
+  width: auto;
+  border-radius: 15px;
+  padding: 0 12px;
+  margin-left: 4px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.App .points-controls .score {
+  min-width: 40px;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: var(--darkBlueColor);
+}
+
+/* Score Controls */
+.App .score-button {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 8px;
+  font-size: 1.5rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--lightBackgroundColor);
+  transition: all 0.2s ease;
+}
+
+.App .score-button:hover {
+  background-color: var(--activeColor);
+  transform: translateY(-1px);
+}
+
+.App .score-button:active {
+  transform: translateY(0);
+}

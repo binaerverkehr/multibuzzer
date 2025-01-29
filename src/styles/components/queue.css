@@ -1,0 +1,180 @@
+@import '../variables.css';
+
+.App .queue {
+  margin-top: 40px;
+}
+
+.App .queue p {
+  margin-bottom: 0;
+}
+
+.App .queue ul {
+  padding: 0;
+  list-style-type: none;
+}
+
+.App .queue li {
+  font-size: 1.5rem;
+}
+
+.App .queue li .player-sign {
+  display: inline-block;
+  min-width: 150px;
+  padding: 8px 15px;
+  border-radius: 8px;
+  transition: all ease-in-out 0.2s;
+  background-color: var(--darkBlueColor);
+  margin: 4px 0;
+}
+
+.App .queue li:first-child .player-sign {
+  background-color: var(--brightBlueColor);
+  box-shadow: 0 0 15px rgba(52, 141, 245, 0.2);
+}
+
+.App .player-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+.App .score {
+  font-weight: 600;
+  color: var(--yellowColor);
+  min-width: 30px;
+  text-align: center;
+  position: relative;
+}
+
+.App .score.clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.App .score.clickable:hover {
+  background-color: var(--lightBackgroundColor);
+}
+
+.App .score-popup {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--darkBlueColor);
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  margin-top: 8px;
+  min-width: 120px;
+  animation: fadeIn 0.2s ease;
+}
+
+.App .score-popup::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 12px;
+  background-color: var(--darkBlueColor);
+  transform-origin: center;
+  rotate: 45deg;
+}
+
+.App .score-display {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--yellowColor);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.App .score-controls {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.App .queue li .name {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.App .queue li .name .name-content {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.App .queue li .name .sound-toggle {
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--dimTextColor);
+  font-size: 1rem;
+}
+
+.App .queue li .name .sound-toggle:hover {
+  background-color: var(--lightBackgroundColor);
+  color: var(--brightBlueColor);
+}
+
+.App .queue li .name .sound-toggle svg {
+  font-size: 1.2rem;
+}
+
+.App .queue li.resettable .player-sign {
+  cursor: pointer;
+}
+
+.App .queue li.resettable .player-sign:hover {
+  background-color: var(--lightBackgroundColor);
+}
+
+.App .queue .disconnected {
+  margin-left: 5px;
+  color: var(--redColor);
+  opacity: 1;
+  animation: pulse 2s infinite;
+}
+
+.App .queue .answer {
+  color: var(--greenColor);
+  font-weight: 500;
+  margin: 0 10px;
+}
+
+.App .missing-answer {
+  color: var(--redColor) !important;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@media screen and (max-width: 767px) {
+  .App .player-info {
+    gap: 5px;
+  }
+  
+  .App .score {
+    font-size: 1.2rem;
+  }
+}

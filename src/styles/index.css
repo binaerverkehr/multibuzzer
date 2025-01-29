@@ -1,0 +1,22 @@
+/* Variables */
+@import './variables.css';
+
+/* Base Styles */
+@import './base.css';
+
+/* Layout */
+@import './layout/header.css';
+@import './layout/footer.css';
+@import './layout/container.css';
+
+/* Components */
+@import './components/button.css';
+@import './components/buzzer.css';
+@import './components/queue.css';
+@import './components/admin-panel.css';
+@import './components/mode-switch.css';
+@import './components/sound-controls.css';
+@import './components/form.css';
+
+/* Pages */
+@import './pages/lobby.css';

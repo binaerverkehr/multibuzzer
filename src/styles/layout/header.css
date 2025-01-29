@@ -1,0 +1,90 @@
+@import '../variables.css';
+
+.App header nav {
+  min-height: 60px;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--activeColor);
+  padding: 0.5rem 1rem;
+}
+
+.App header .navbar-brand {
+  color: white;
+  font-weight: 600;
+  font-size: 1.2rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.App header .navbar-brand:hover {
+  color: white;
+}
+
+.App header .navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.App header .header-info {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.App header .room-id,
+.App header .player-name {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--dimTextColor);
+  padding: 0.25rem 1rem;
+  background-color: var(--darkBlueColor);
+  border-radius: 6px;
+}
+
+.App header svg {
+  margin-right: 10px;
+}
+
+.App header .nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Header Sound Controls */
+.App header .sound-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background-color: var(--darkBlueColor);
+  border: 1px solid var(--activeColor);
+  color: var(--dimTextColor);
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  min-width: 40px;
+  height: 40px;
+}
+
+.App header .sound-button:hover {
+  background-color: var(--lightBackgroundColor);
+  color: var(--brightBlueColor);
+  border-color: var(--brightBlueColor);
+}
+
+.App header .sound-button.active {
+  background-color: rgba(52, 141, 245, 0.15);
+  color: var(--brightBlueColor);
+  border-color: var(--brightBlueColor);
+}
+
+.App header .sound-button.active:hover {
+  background-color: rgba(52, 141, 245, 0.25);
+}
+
+.App header .sound-button svg {
+  font-size: 1.2rem;
+}

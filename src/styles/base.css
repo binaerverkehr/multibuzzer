@@ -1,0 +1,50 @@
+@import './variables.css';
+
+html,
+body {
+  background-color: var(--backgroundColor);
+}
+
+.App {
+  color: white;
+  font-family: 'Inter', sans-serif;
+}
+
+.App main {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.App .primary {
+  flex: 1;
+  background-color: var(--backgroundColor);
+}
+
+/* Utility Classes */
+.App .mini {
+  font-size: 1rem;
+}
+
+.App .tiny {
+  font-size: 0.8rem;
+}
+
+.App .bold {
+  font-weight: 600;
+}
+
+.App .dim {
+  opacity: 0.5;
+}
+
+.App .warning {
+  color: var(--lightRedColor);
+  font-weight: 500;
+}
+
+.App .divider {
+  border: 1px solid var(--activeColor);
+  margin: 60px auto;
+  width: 75%;
+}

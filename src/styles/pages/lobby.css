@@ -1,0 +1,33 @@
+@import '../variables.css';
+
+/* Lobby Layout */
+.App #lobby-left {
+  flex-grow: 40;
+  flex-basis: 320px;
+  background-color: var(--darkBlueColor);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.App #lobby-right {
+  flex-grow: 60;
+  flex-basis: 480px;
+}
+
+/* Touts Section */
+.App .touts > :not(:first-child) {
+  margin-top: 40px;
+}
+
+.App .touts h4 {
+  font-weight: 500;
+  font-size: 1.2rem;
+  line-height: 140%;
+}
+
+.App .touts p {
+  color: var(--paragraphColor);
+  line-height: 140%;
+  font-size: 1rem;
+}

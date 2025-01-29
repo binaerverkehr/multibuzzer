@@ -9,7 +9,6 @@ import { get, isNil } from 'lodash';
 
 import Lobby from './containers/Lobby';
 import Game from './containers/Game';
-import './App.css';
 
 function App() {
   const [auth, setAuth] = useState({

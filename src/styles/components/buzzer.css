@@ -1,0 +1,78 @@
+@import '../variables.css';
+
+.App #buzzer {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.App #buzzer > button {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background-color: var(--brightBlueColor);
+  color: white;
+  border: none;
+  font-weight: 700;
+  font-size: 2rem;
+  user-select: none;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 0 20px rgba(52, 141, 245, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.App #buzzer > button:hover {
+  background-color: var(--hoverBlueColor);
+  transform: scale(1.02);
+  box-shadow: 0 0 30px rgba(52, 141, 245, 0.3);
+}
+
+.App #buzzer > button:active {
+  background-color: var(--darkBlueColor);
+  transform: scale(0.98);
+}
+
+.App #buzzer > button:disabled {
+  background-color: var(--lightBackgroundColor);
+  transform: none;
+  box-shadow: none;
+}
+
+@keyframes buzzPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.App #buzzer > button.buzzed {
+  animation: buzzPulse 0.3s ease-in-out;
+  background-color: var(--redColor);
+}
+
+.App #buzzer > button.locked {
+  background-color: var(--lightBackgroundColor);
+  opacity: 0.8;
+}
+
+@media screen and (max-width: 767px) {
+  .App #buzzer > button {
+    width: 200px;
+    height: 200px;
+    font-size: 1.5rem;
+  }
+  
+  .App #buzzer {
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .App #buzzer > button {
+    width: 180px;
+    height: 180px;
+    font-size: 1.3rem;
+  }
+}

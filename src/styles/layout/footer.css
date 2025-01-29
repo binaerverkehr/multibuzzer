@@ -1,0 +1,25 @@
+@import '../variables.css';
+
+.App footer {
+  background-color: var(--backgroundColor);
+  padding: 30px 0;
+  color: var(--paragraphColor);
+  text-align: center;
+  margin-top: 40px;
+}
+
+.App #footer-simple {
+  padding: 30px 0;
+  color: var(--paragraphColor);
+}
+
+.App footer a,
+.App #footer-simple a {
+  color: var(--lightBlueColor);
+}
+
+.App footer a:hover,
+.App #footer-simple a:hover {
+  text-decoration: none;
+  opacity: 0.5;
+}

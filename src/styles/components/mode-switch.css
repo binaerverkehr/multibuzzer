@@ -1,0 +1,61 @@
+@import '../variables.css';
+
+/* Mode Switch */
+.App .mode-switch-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 15px;
+  background-color: var(--lightBackgroundColor);
+  border-radius: 8px;
+}
+
+.App .mode-switch-container .mode-label {
+  color: white;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.App .mode-switch-container .form-check {
+  margin: 0;
+  padding: 0;
+}
+
+/* Form Switch Styling */
+.App .form-check-input {
+  background-color: var(--lightBackgroundColor);
+  border-color: var(--activeColor);
+  width: 3rem;
+  height: 1.5rem;
+  margin-top: 0.25rem;
+  margin-right: 10px;
+}
+
+.App .form-check-input:checked {
+  background-color: var(--brightBlueColor);
+  border-color: var(--brightBlueColor);
+}
+
+.App .form-check-input:focus {
+  border-color: var(--brightBlueColor);
+  box-shadow: 0 0 0 0.2rem rgba(52, 141, 245, 0.25);
+}
+
+.App .form-check-label {
+  color: white;
+  font-weight: 500;
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+.App .form-check {
+  background-color: var(--lightBackgroundColor);
+  padding: 15px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.App .form-check:hover {
+  background-color: var(--activeColor);
+}

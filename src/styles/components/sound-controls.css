@@ -1,0 +1,36 @@
+@import '../variables.css';
+
+.App .sound-control {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.App .sound-control .sound-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background-color: var(--darkBlueColor);
+  border: 1px solid var(--activeColor);
+  color: var(--dimTextColor);
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.App .sound-control .sound-button:hover {
+  background-color: var(--lightBackgroundColor);
+  color: white;
+  border-color: var(--brightBlueColor);
+}
+
+.App .sound-control .sound-button.active {
+  background-color: var(--brightBlueColor);
+  color: white;
+  border-color: var(--brightBlueColor);
+}
+
+.App .sound-control .sound-button svg {
+  font-size: 1.2rem;
+}

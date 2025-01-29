@@ -1,0 +1,17 @@
+:root {
+  --backgroundColor: #282c35;
+  --lightBackgroundColor: #343a48;
+  --redColor: #d0021b;
+  --lightRedColor: #e36776;
+  --yellowColor: #fff3c8;
+  --greenColor: #a7ff91;
+  --lightBlueColor: #aed1fb;
+  --hoverBlueColor: #4898f6;
+  --brightBlueColor: #348df5;
+  --activeColor: #3b404b;
+  --dimTextColor: #a7a9ae;
+  --disabledTextColor: #57595c;
+  --paragraphColor: #b4b4b4;
+  --darkBlueColor: #2c313e;
+  --disabledBlueColor: #1a477b;
+}

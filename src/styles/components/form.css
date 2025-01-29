@@ -1,0 +1,95 @@
+@import '../variables.css';
+
+/* Form Styles */
+.App .lobby-form h3 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.App .lobby-form .form-group:not(:first-of-type) {
+  margin-top: 2rem;
+}
+
+.App .lobby-form .error-message {
+  height: 1rem;
+  font-size: 0.9rem;
+  color: var(--lightRedColor);
+  font-weight: 500;
+  text-align: center;
+}
+
+.App .lobby-form button[type='submit'] {
+  width: 100%;
+  background-color: var(--brightBlueColor);
+  border: none;
+  margin-top: 1rem;
+  padding: 12px 15px;
+}
+
+.App .lobby-form button[type='submit']:hover {
+  background-color: var(--hoverBlueColor);
+}
+
+.App .lobby-form button[type='submit']:disabled {
+  background-color: var(--disabledBlueColor);
+}
+
+.App .lobby-form button.inline {
+  background: none;
+  border: none;
+  padding: 0;
+  font-weight: 500;
+  display: inline-block;
+  color: var(--lightBlueColor);
+  width: auto;
+}
+
+.App .lobby-form .switcher {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.App .lobby-form button.inline:hover {
+  opacity: 0.5;
+}
+
+/* Text Input Styles */
+.App .text-input-container {
+  margin: 20px auto;
+  max-width: 500px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.App .text-input-container input {
+  flex: 1;
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid var(--activeColor);
+  background-color: var(--darkBlueColor);
+  color: white;
+}
+
+.App .text-input-container input:disabled {
+  background-color: var(--lightBackgroundColor);
+  border-color: var(--disabledTextColor);
+  color: var(--disabledTextColor);
+}
+
+.App .text-input-container .submit-answer {
+  white-space: nowrap;
+  background-color: var(--brightBlueColor);
+  border: none;
+  padding: 10px 20px;
+}
+
+.App .text-input-container .submit-answer:disabled {
+  background-color: var(--disabledBlueColor);
+}
+
+.App .text-input-container .submit-answer:hover:enabled {
+  background-color: var(--hoverBlueColor);
+}
