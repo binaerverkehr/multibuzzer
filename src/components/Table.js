@@ -4,6 +4,7 @@ import { AiOutlineDisconnect } from 'react-icons/ai';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { Container, Form, Table as BootstrapTable } from 'react-bootstrap';
 import Header from '../components/Header';
+import '../styles/components/score.css';
 
 export default function Table(game) {
   const [loaded, setLoaded] = useState(false);
@@ -13,9 +14,11 @@ export default function Table(game) {
   const [lastBuzz, setLastBuzz] = useState(null);
   const [showScorePopup, setShowScorePopup] = useState(null);
   const [textAnswer, setTextAnswer] = useState('');
+  const [scoreAnimations, setScoreAnimations] = useState({});
   const buzzButton = useRef(null);
   const queueRef = useRef(null);
   const lastQueueLength = useRef(0);
+  const scoresRef = useRef(game.G.scores || {});
 
   // Close score popup when clicking outside
   useEffect(() => {
@@ -69,6 +72,33 @@ export default function Table(game) {
 
     queueRef.current = game.G.queue;
   }, [game.G.queue]);
+
+  // Track score changes and trigger animations
+  useEffect(() => {
+    const currentScores = game.G.scores || {};
+    const previousScores = scoresRef.current;
+    
+    Object.keys(currentScores).forEach(playerId => {
+      const currentScore = currentScores[playerId] || 0;
+      const previousScore = previousScores[playerId] || 0;
+      
+      if (currentScore > previousScore) {
+        setScoreAnimations(prev => ({
+          ...prev,
+          [playerId]: true
+        }));
+        
+        setTimeout(() => {
+          setScoreAnimations(prev => ({
+            ...prev,
+            [playerId]: false
+          }));
+        }, 500);
+      }
+    });
+    
+    scoresRef.current = currentScores;
+  }, [game.G.scores]);
 
   const attemptBuzz = () => {
     if (!buzzed) {
@@ -165,7 +195,7 @@ export default function Table(game) {
       >
         -1
       </button>
-      <div className="score">
+      <div className={`score ${scoreAnimations[id] ? 'score-increased' : ''}`}>
         {(game.G.scores && game.G.scores[id]) || 0}
       </div>
       <button
@@ -269,7 +299,9 @@ export default function Table(game) {
                 <tr key={id} className={!connected ? 'dim' : ''}>
                   <td>{index + 1}</td>
                   <td>{renderPlayerName(id, name, connected)}</td>
-                  <td>{(game.G.scores && game.G.scores[id]) || 0}</td>
+                  <td className={`score ${scoreAnimations[id] ? 'score-increased' : ''}`}>
+                    {(game.G.scores && game.G.scores[id]) || 0}
+                  </td>
                   {isHost && <td>{renderScoreControls(id)}</td>}
                 </tr>
               ))}

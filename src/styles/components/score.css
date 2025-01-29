@@ -1,0 +1,28 @@
+@import '../variables.css';
+
+.score {
+  position: relative;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease-in-out;
+}
+
+.score.score-increased {
+  animation: scoreIncrease 0.5s ease-in-out;
+}
+
+@keyframes scoreIncrease {
+  0% {
+    transform: scale(1);
+    color: var(--textColor);
+  }
+  50% {
+    transform: scale(1.2);
+    color: #4CAF50;
+    text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+  }
+  100% {
+    transform: scale(1);
+    color: var(--textColor);
+  }
+}
