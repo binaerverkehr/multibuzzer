@@ -11,8 +11,20 @@ const PORT = process.env.PORT || 4001;
 const { app } = server;
 
 const FRONTEND_PATH = path.join(__dirname, '../build');
+const PUBLIC_PATH = path.join(__dirname, '../public');
+
+// Serve static files from build directory
 app.use(
   serve(FRONTEND_PATH, {
+    setHeaders: (res) => {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    },
+  })
+);
+
+// Serve static files from public directory
+app.use(
+  serve(PUBLIC_PATH, {
     setHeaders: (res) => {
       res.setHeader('Access-Control-Allow-Origin', '*');
     },
