@@ -71,7 +71,7 @@ export default function Table(game) {
     }
 
     queueRef.current = game.G.queue;
-  }, [game.G.queue]);
+  }, [game.G.queue, game.playerID, lastBuzz, loaded]);
 
   // Track score changes and trigger animations
   useEffect(() => {
@@ -156,13 +156,6 @@ export default function Table(game) {
     })
     .filter((p) => p.name)
     .filter((p) => !game.G.hideHost || p.id !== hostId);
-  // active players who haven't buzzed
-  const activePlayers = orderBy(
-    players.filter((p) => !some(queue, (q) => q.id === p.id)),
-    ['connected', 'name'],
-    ['desc', 'asc']
-  );
-
   // Sort all players by score for leaderboard
   const allPlayersSorted = orderBy(
     players.filter(p => !game.G.hideHost || p.id !== hostId),

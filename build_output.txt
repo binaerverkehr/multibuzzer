@@ -1,0 +1,135 @@
+ Service multibuzzer  Building
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [multibuzzer internal] load build definition from Dockerfile
+#1 transferring dockerfile: 552B done
+#1 DONE 0.0s
+
+#2 [multibuzzer internal] load metadata for docker.io/library/node:20.12.2
+#2 ...
+
+#3 [multibuzzer auth] library/node:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#4 [multibuzzer internal] load metadata for docker.io/library/node:20.12.2-slim
+#4 ...
+
+#2 [multibuzzer internal] load metadata for docker.io/library/node:20.12.2
+#2 DONE 1.2s
+
+#4 [multibuzzer internal] load metadata for docker.io/library/node:20.12.2-slim
+#4 DONE 1.2s
+
+#5 [multibuzzer internal] load .dockerignore
+#5 transferring context: 397B done
+#5 DONE 0.0s
+
+#6 [multibuzzer builder 1/6] FROM docker.io/library/node:20.12.2@sha256:3864be2201676a715cf240cfc17aec1d62459f92a7cbe7d32d1675e226e736c9
+#6 DONE 0.0s
+
+#7 [multibuzzer stage-1 1/7] FROM docker.io/library/node:20.12.2-slim@sha256:72f2f046a5f8468db28730b990b37de63ce93fd1a72a40f531d6aa82afdf0d46
+#7 DONE 0.0s
+
+#8 [multibuzzer internal] load build context
+#8 transferring context: 5.28kB done
+#8 DONE 0.0s
+
+#9 [multibuzzer builder 2/6] WORKDIR /app
+#9 CACHED
+
+#10 [multibuzzer builder 3/6] COPY package.json yarn.lock ./
+#10 CACHED
+
+#11 [multibuzzer builder 4/6] RUN yarn install --frozen-lockfile
+#11 CACHED
+
+#12 [multibuzzer builder 5/6] COPY . .
+#12 DONE 0.0s
+
+#13 [multibuzzer builder 6/6] RUN yarn build
+#13 0.269 yarn run v1.22.19
+#13 0.298 $ react-scripts build
+#13 1.235 Creating an optimized production build...
+#13 12.37 Compiled successfully.
+#13 12.37 
+#13 12.37 File sizes after gzip:
+#13 12.37 
+#13 12.38   150.13 kB  build/static/js/main.ba6c53d0.js
+#13 12.38   3.31 kB    build/static/css/main.3b80bbe7.css
+#13 12.38 
+#13 12.39 The project was built assuming it is hosted at /.
+#13 12.39 You can control this with the homepage field in your package.json.
+#13 12.39 
+#13 12.39 The build folder is ready to be deployed.
+#13 12.39 You may serve it with a static server:
+#13 12.39 
+#13 12.39   yarn global add serve
+#13 12.39   serve -s build
+#13 12.39 
+#13 12.39 Find out more about deployment here:
+#13 12.39 
+#13 12.39   https://cra.link/deployment
+#13 12.39 
+#13 12.43 Done in 12.17s.
+#13 DONE 12.5s
+
+#14 [multibuzzer stage-1 5/7] COPY --from=builder /app/build ./build
+#14 CACHED
+
+#15 [multibuzzer stage-1 2/7] WORKDIR /app
+#15 CACHED
+
+#16 [multibuzzer stage-1 3/7] COPY package.json yarn.lock ./
+#16 CACHED
+
+#17 [multibuzzer stage-1 4/7] RUN yarn install --production --frozen-lockfile
+#17 CACHED
+
+#18 [multibuzzer stage-1 6/7] COPY --from=builder /app/public ./public
+#18 CACHED
+
+#19 [multibuzzer stage-1 7/7] COPY --from=builder /app/src ./src
+#19 CACHED
+ Service multibuzzer  Built
+
+#20 [multibuzzer] exporting to image
+#20 exporting layers done
+#20 writing image sha256:c002791343ff57891bd63b98df917847cd1c0eafa8f3348fb547a9419a342f6b done
+#20 naming to docker.io/library/multibuzzer-multibuzzer done
+#20 DONE 0.0s
+
+#21 [multibuzzer] resolving provenance for metadata file
+#21 DONE 0.0s
+ Network multibuzzer_default  Creating
+ Network multibuzzer_default  Created
+ Container multibuzzer-multibuzzer-1  Creating
+ Container multibuzzer-multibuzzer-1  Created
+Attaching to multibuzzer-1
+multibuzzer-1  | yarn run v1.22.19
+multibuzzer-1  | $ concurrently "PORT=4000 yarn client" "PORT=4001 yarn start"
+multibuzzer-1  | [0] $ react-scripts start
+multibuzzer-1  | [1] $ node -r esm src/server.js
+multibuzzer-1  | [1] INFO: App serving on 4001...
+multibuzzer-1  | [0] (node:76) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+multibuzzer-1  | [0] (Use `node --trace-deprecation ...` to show where the warning was created)
+multibuzzer-1  | [0] (node:76) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+multibuzzer-1  | [0] Starting the development server...
+multibuzzer-1  | [0] 
+multibuzzer-1  | [0] Compiled successfully!
+multibuzzer-1  | [0] 
+multibuzzer-1  | [0] You can now view multibuzzer in the browser.
+multibuzzer-1  | [0] 
+multibuzzer-1  | [0]   Local:            http://localhost:4000
+multibuzzer-1  | [0]   On Your Network:  http://172.18.0.2:4000
+multibuzzer-1  | [0] 
+multibuzzer-1  | [0] Note that the development build is not optimized.
+multibuzzer-1  | [0] To create a production build, use yarn build.
+multibuzzer-1  | [0] 
+multibuzzer-1  | [0] webpack compiled successfully
+multibuzzer-1  | [0] Compiling...
+multibuzzer-1  | [0] Compiled successfully!
+multibuzzer-1  | [0] webpack compiled successfully
+Gracefully stopping... (press Ctrl+C again to force)
+ Container multibuzzer-multibuzzer-1  Stopping
+ Container multibuzzer-multibuzzer-1  Stopped
+canceled
