@@ -392,13 +392,15 @@ export default function Table(game) {
       {/* Host Administration Panel */}
       {isHost && (
         <>
-          <button
-            className="admin-fab"
-            onClick={() => setIsAdminPanelVisible(true)}
-            aria-label="Open admin panel"
-          >
-            <FaCog />
-          </button>
+          {!isAdminPanelVisible && (
+            <button
+              className="admin-fab"
+              onClick={() => setIsAdminPanelVisible(true)}
+              aria-label="Open admin panel"
+            >
+              <FaCog />
+            </button>
+          )}
           <div
             className={`admin-panel ${game.G.textInputMode ? 'text-input-mode' : ''} ${isAdminPanelVisible ? 'visible' : ''
               }`}
@@ -414,65 +416,59 @@ export default function Table(game) {
               </button>
             </div>
             <div className="settings-grid">
-              <div className="mode-switch-container">
-                <span className="mode-label">Eingabe-Modus</span>
-                <Form.Check
-                  type="switch"
-                  id="text-input-mode"
-                  checked={game.G.textInputMode}
-                  onChange={() => game.moves.toggleTextInputMode()}
-                  aria-label="Toggle between text input and buzzer mode"
-                />
-                <span className="mode-label">Buzzer-Modus</span>
-              </div>
-              <div className="mode-switch-container">
-                <span className="mode-label">Host anzeigen</span>
-                <Form.Check
-                  type="switch"
-                  id="show-host"
-                  checked={!game.G.hideHost}
-                  onChange={() => game.moves.toggleHostVisibility()}
-                  aria-label="Toggle host visibility in lists"
-                />
-              </div>
+              <div className="mode-switch-container"><span className="mode-label">📝</span><Form.Check type="switch" id="text-input-mode" checked={game.G.textInputMode} onChange={() => game.moves.toggleTextInputMode()} aria-label="Toggle between text input and buzzer mode" /><span className="mode-label">🔴</span></div>
+              <div className="mode-switch-container"><span className="mode-label">Host anzeigen</span><Form.Check type="switch" id="show-host" checked={!game.G.hideHost} onChange={() => game.moves.toggleHostVisibility()} aria-label="Toggle host visibility in lists" /></div>
               {game.G.textInputMode ? (
-                <div className="button-container settings-item">
-                  <button
-                    className="text-button"
-                    onClick={() => game.moves.toggleTextInputLock()}
-                    aria-label={game.G.textInputLocked ? 'Unlock text answers' : 'Lock text answers'}
-                    title={game.G.textInputLocked ? 'Allow participants to submit answers' : 'Prevent new answer submissions'}
-                  >
-                    {game.G.textInputLocked ? 'Unlock answers' : 'Lock answers'}
-                  </button>
-                  <button
-                    className="text-button"
-                    onClick={() => game.moves.clearTextAnswers()}
-                    aria-label="Clear all text answers"
-                    title="Remove all submitted answers"
-                  >
-                    Clear answers
-                  </button>
+                <div className="settings-grid">
+                  <div className="button-container settings-item">
+                    <button
+                      className={`text-button ${game.G.textInputLocked ? 'locked' : ''}`}
+                      onClick={() => game.moves.toggleTextInputLock()}
+                      aria-label={game.G.textInputLocked ? 'Unlock text answers' : 'Lock text answers'}
+                      title={game.G.textInputLocked ? 'Allow participants to submit answers' : 'Prevent new answer submissions'}
+                    >
+                      <span className="button-icon">{game.G.textInputLocked ? '🔓' : '🔒'}</span>
+                      {game.G.textInputLocked ? 'Unlock answers' : 'Lock answers'}
+                    </button>
+                  </div>
+                  <div className="button-container settings-item">
+                    <button
+                      className="text-button"
+                      onClick={() => {
+                        if (window.confirm('Are you sure you want to clear all answers?')) {
+                          game.moves.clearTextAnswers();
+                        }
+                      }}
+                      aria-label="Clear all text answers"
+                      title="Remove all submitted answers"
+                    >
+                      <span className="button-icon">🗑️</span>
+                      Clear answers
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <>
                   <div className="button-container settings-item">
                     <button
-                      className="text-button"
+                      className={`text-button ${game.G.locked ? 'locked' : ''}`}
                       onClick={() => game.moves.toggleLock()}
                       aria-label={game.G.locked ? 'Unlock buzzers' : 'Lock buzzers'}
                       title={game.G.locked ? 'Allow participants to buzz in' : 'Prevent new buzzes'}
                     >
+                      <span className="button-icon">{game.G.locked ? '🔓' : '🔒'}</span>
                       {game.G.locked ? 'Unlock buzzers' : 'Lock buzzers'}
                     </button>
                   </div>
-                  <div className="button-container">
+                  <div className="button-container settings-item">
                     <button
-                      disabled={isEmpty(game.G.queue)}
-                      onClick={() => game.moves.resetBuzzers()}
+                      className={`text-button ${isEmpty(game.G.queue) ? 'disabled' : ''}`}
+                      onClick={() => !isEmpty(game.G.queue) && game.moves.resetBuzzers()}
                       aria-label="Reset all buzzers"
                       title="Clear all current buzzes"
+                      disabled={isEmpty(game.G.queue)}
                     >
+                      <span className="button-icon">🔄</span>
                       Reset all buzzers
                     </button>
                   </div>
