@@ -1,0 +1,79 @@
+@import '../variables.css';
+
+/* Base table styles */
+.table {
+  margin-bottom: 1rem;
+  color: var(--textColor);
+}
+
+/* Responsive table styles */
+@media (max-width: 768px) {
+  .table {
+    font-size: 0.875rem;
+  }
+
+  .table td,
+  .table th {
+    padding: 0.5rem;
+  }
+
+  .game-section {
+    margin-bottom: 1rem;
+  }
+
+  .game-section h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Handle text overflow */
+  .table td {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Optimize score controls */
+  .points-controls {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .point-button {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  /* Optimize player name display */
+  .name-content {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .disconnected {
+    font-size: 0.875rem;
+  }
+}
+
+/* Even more compact for very small screens */
+@media (max-width: 480px) {
+  .table {
+    font-size: 0.8125rem;
+  }
+
+  .table td,
+  .table th {
+    padding: 0.375rem;
+  }
+
+  .point-button {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.8125rem;
+  }
+
+  .game-section h3 {
+    font-size: 1.125rem;
+  }
+}

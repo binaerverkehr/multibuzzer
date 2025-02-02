@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { get, some, values, sortBy, orderBy, isEmpty, round } from 'lodash';
-import { AiOutlineDisconnect } from 'react-icons/ai';
-import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
+import { AiOutlineDisconnect, AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
+import { FaCog, FaTimes } from 'react-icons/fa';
 import { Container, Form, Table as BootstrapTable } from 'react-bootstrap';
 import Header from '../components/Header';
 import '../styles/components/score.css';
+import '../styles/components/table.css';
 
 export default function Table(game) {
   const [loaded, setLoaded] = useState(false);
@@ -15,6 +16,7 @@ export default function Table(game) {
   const [showScorePopup, setShowScorePopup] = useState(null);
   const [textAnswer, setTextAnswer] = useState('');
   const [scoreAnimations, setScoreAnimations] = useState({});
+  const [isAdminPanelVisible, setIsAdminPanelVisible] = useState(false);
   const buzzButton = useRef(null);
   const queueRef = useRef(null);
   const lastQueueLength = useRef(0);
@@ -77,17 +79,17 @@ export default function Table(game) {
   useEffect(() => {
     const currentScores = game.G.scores || {};
     const previousScores = scoresRef.current;
-    
+
     Object.keys(currentScores).forEach(playerId => {
       const currentScore = currentScores[playerId] || 0;
       const previousScore = previousScores[playerId] || 0;
-      
+
       if (currentScore > previousScore) {
         setScoreAnimations(prev => ({
           ...prev,
           [playerId]: true
         }));
-        
+
         setTimeout(() => {
           setScoreAnimations(prev => ({
             ...prev,
@@ -96,7 +98,7 @@ export default function Table(game) {
         }, 500);
       }
     });
-    
+
     scoresRef.current = currentScores;
   }, [game.G.scores]);
 
@@ -130,8 +132,8 @@ export default function Table(game) {
   const players = !game.gameMetadata
     ? []
     : game.gameMetadata
-        .filter((p) => p.name)
-        .map((p) => ({ ...p, id: String(p.id) }));
+      .filter((p) => p.name)
+      .map((p) => ({ ...p, id: String(p.id) }));
   // host is lowest active user
   const firstPlayer =
     get(
@@ -320,8 +322,8 @@ export default function Table(game) {
                 </thead>
                 <tbody>
                   {buzzedPlayers.map(({ id, name, timestamp, connected }, i) => (
-                    <tr 
-                      key={id} 
+                    <tr
+                      key={id}
                       className={`${i === 0 ? 'first-buzz' : ''} ${!connected ? 'dim' : ''}`}
                       onClick={() => {
                         if (isHost) {
@@ -389,74 +391,96 @@ export default function Table(game) {
 
       {/* Host Administration Panel */}
       {isHost && (
-        <div className="admin-panel">
-          <div className="settings-grid">
-            <div className="mode-switch-container">
-              <span className="mode-label">Eingabe-Modus</span>
-              <Form.Check
-                type="switch"
-                id="text-input-mode"
-                checked={game.G.textInputMode}
-                onChange={() => game.moves.toggleTextInputMode()}
-                aria-label="Toggle between text input and buzzer mode"
-              />
-              <span className="mode-label">Buzzer-Modus</span>
+        <>
+          <button
+            className="admin-fab"
+            onClick={() => setIsAdminPanelVisible(true)}
+            aria-label="Open admin panel"
+          >
+            <FaCog />
+          </button>
+          <div
+            className={`admin-panel ${game.G.textInputMode ? 'text-input-mode' : ''} ${isAdminPanelVisible ? 'visible' : ''
+              }`}
+          >
+            <div className="admin-panel-header">
+              <h2 className="admin-panel-title">Host-Optionen</h2>
+              <button
+                className="admin-panel-close"
+                onClick={() => setIsAdminPanelVisible(false)}
+                aria-label="Close admin panel"
+              >
+                <FaTimes />
+              </button>
             </div>
-            <div className="mode-switch-container">
-              <span className="mode-label">Host anzeigen</span>
-              <Form.Check
-                type="switch"
-                id="show-host"
-                checked={!game.G.hideHost}
-                onChange={() => game.moves.toggleHostVisibility()}
-                aria-label="Toggle host visibility in lists"
-              />
-            </div>
-            {game.G.textInputMode ? (
-              <div className="button-container settings-item">
-                <button
-                  className="text-button"
-                  onClick={() => game.moves.toggleTextInputLock()}
-                  aria-label={game.G.textInputLocked ? 'Unlock text answers' : 'Lock text answers'}
-                  title={game.G.textInputLocked ? 'Allow participants to submit answers' : 'Prevent new answer submissions'}
-                >
-                  {game.G.textInputLocked ? 'Unlock answers' : 'Lock answers'}
-                </button>
-                <button
-                  className="text-button"
-                  onClick={() => game.moves.clearTextAnswers()}
-                  aria-label="Clear all text answers"
-                  title="Remove all submitted answers"
-                >
-                  Clear answers
-                </button>
+            <div className="settings-grid">
+              <div className="mode-switch-container">
+                <span className="mode-label">Eingabe-Modus</span>
+                <Form.Check
+                  type="switch"
+                  id="text-input-mode"
+                  checked={game.G.textInputMode}
+                  onChange={() => game.moves.toggleTextInputMode()}
+                  aria-label="Toggle between text input and buzzer mode"
+                />
+                <span className="mode-label">Buzzer-Modus</span>
               </div>
-            ) : (
-              <>
+              <div className="mode-switch-container">
+                <span className="mode-label">Host anzeigen</span>
+                <Form.Check
+                  type="switch"
+                  id="show-host"
+                  checked={!game.G.hideHost}
+                  onChange={() => game.moves.toggleHostVisibility()}
+                  aria-label="Toggle host visibility in lists"
+                />
+              </div>
+              {game.G.textInputMode ? (
                 <div className="button-container settings-item">
                   <button
                     className="text-button"
-                    onClick={() => game.moves.toggleLock()}
-                    aria-label={game.G.locked ? 'Unlock buzzers' : 'Lock buzzers'}
-                    title={game.G.locked ? 'Allow participants to buzz in' : 'Prevent new buzzes'}
+                    onClick={() => game.moves.toggleTextInputLock()}
+                    aria-label={game.G.textInputLocked ? 'Unlock text answers' : 'Lock text answers'}
+                    title={game.G.textInputLocked ? 'Allow participants to submit answers' : 'Prevent new answer submissions'}
                   >
-                    {game.G.locked ? 'Unlock buzzers' : 'Lock buzzers'}
+                    {game.G.textInputLocked ? 'Unlock answers' : 'Lock answers'}
                   </button>
-                </div>
-                <div className="button-container">
                   <button
-                    disabled={isEmpty(game.G.queue)}
-                    onClick={() => game.moves.resetBuzzers()}
-                    aria-label="Reset all buzzers"
-                    title="Clear all current buzzes"
+                    className="text-button"
+                    onClick={() => game.moves.clearTextAnswers()}
+                    aria-label="Clear all text answers"
+                    title="Remove all submitted answers"
                   >
-                    Reset all buzzers
+                    Clear answers
                   </button>
                 </div>
-              </>
-            )}
+              ) : (
+                <>
+                  <div className="button-container settings-item">
+                    <button
+                      className="text-button"
+                      onClick={() => game.moves.toggleLock()}
+                      aria-label={game.G.locked ? 'Unlock buzzers' : 'Lock buzzers'}
+                      title={game.G.locked ? 'Allow participants to buzz in' : 'Prevent new buzzes'}
+                    >
+                      {game.G.locked ? 'Unlock buzzers' : 'Lock buzzers'}
+                    </button>
+                  </div>
+                  <div className="button-container">
+                    <button
+                      disabled={isEmpty(game.G.queue)}
+                      onClick={() => game.moves.resetBuzzers()}
+                      aria-label="Reset all buzzers"
+                      title="Clear all current buzzes"
+                    >
+                      Reset all buzzers
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
