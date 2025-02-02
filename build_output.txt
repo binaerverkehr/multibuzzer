@@ -5,17 +5,11 @@
 #1 transferring dockerfile: 552B done
 #1 DONE 0.0s
 
-#2 [multibuzzer internal] load metadata for docker.io/library/node:20.12.2
-#2 ...
+#2 [multibuzzer auth] library/node:pull token for registry-1.docker.io
+#2 DONE 0.0s
 
-#3 [multibuzzer auth] library/node:pull token for registry-1.docker.io
-#3 DONE 0.0s
-
-#4 [multibuzzer internal] load metadata for docker.io/library/node:20.12.2-slim
-#4 ...
-
-#2 [multibuzzer internal] load metadata for docker.io/library/node:20.12.2
-#2 DONE 1.2s
+#3 [multibuzzer internal] load metadata for docker.io/library/node:20.12.2
+#3 DONE 1.1s
 
 #4 [multibuzzer internal] load metadata for docker.io/library/node:20.12.2-slim
 #4 DONE 1.2s
@@ -31,13 +25,13 @@
 #7 DONE 0.0s
 
 #8 [multibuzzer internal] load build context
-#8 transferring context: 5.28kB done
+#8 transferring context: 11.36kB done
 #8 DONE 0.0s
 
-#9 [multibuzzer builder 2/6] WORKDIR /app
+#9 [multibuzzer builder 3/6] COPY package.json yarn.lock ./
 #9 CACHED
 
-#10 [multibuzzer builder 3/6] COPY package.json yarn.lock ./
+#10 [multibuzzer builder 2/6] WORKDIR /app
 #10 CACHED
 
 #11 [multibuzzer builder 4/6] RUN yarn install --frozen-lockfile
@@ -47,54 +41,55 @@
 #12 DONE 0.0s
 
 #13 [multibuzzer builder 6/6] RUN yarn build
-#13 0.269 yarn run v1.22.19
-#13 0.298 $ react-scripts build
-#13 1.235 Creating an optimized production build...
-#13 12.37 Compiled successfully.
-#13 12.37 
-#13 12.37 File sizes after gzip:
-#13 12.37 
-#13 12.38   150.13 kB  build/static/js/main.ba6c53d0.js
-#13 12.38   3.31 kB    build/static/css/main.3b80bbe7.css
-#13 12.38 
-#13 12.39 The project was built assuming it is hosted at /.
-#13 12.39 You can control this with the homepage field in your package.json.
-#13 12.39 
-#13 12.39 The build folder is ready to be deployed.
-#13 12.39 You may serve it with a static server:
-#13 12.39 
-#13 12.39   yarn global add serve
-#13 12.39   serve -s build
-#13 12.39 
-#13 12.39 Find out more about deployment here:
-#13 12.39 
-#13 12.39   https://cra.link/deployment
-#13 12.39 
-#13 12.43 Done in 12.17s.
-#13 DONE 12.5s
+#13 0.284 yarn run v1.22.19
+#13 0.316 $ react-scripts build
+#13 1.266 Creating an optimized production build...
+#13 14.26 Compiled successfully.
+#13 14.26 
+#13 14.26 File sizes after gzip:
+#13 14.26 
+#13 14.28   151.82 kB  build/static/js/main.aa20e1af.js
+#13 14.28   3.96 kB    build/static/css/main.0d97930e.css
+#13 14.28 
+#13 14.28 The project was built assuming it is hosted at /.
+#13 14.28 You can control this with the homepage field in your package.json.
+#13 14.28 
+#13 14.28 The build folder is ready to be deployed.
+#13 14.28 You may serve it with a static server:
+#13 14.28 
+#13 14.28   yarn global add serve
+#13 14.28   serve -s build
+#13 14.28 
+#13 14.28 Find out more about deployment here:
+#13 14.28 
+#13 14.28   https://cra.link/deployment
+#13 14.28 
+#13 14.33 Done in 14.05s.
+#13 DONE 14.4s
 
-#14 [multibuzzer stage-1 5/7] COPY --from=builder /app/build ./build
+#14 [multibuzzer stage-1 2/7] WORKDIR /app
 #14 CACHED
 
-#15 [multibuzzer stage-1 2/7] WORKDIR /app
+#15 [multibuzzer stage-1 3/7] COPY package.json yarn.lock ./
 #15 CACHED
 
-#16 [multibuzzer stage-1 3/7] COPY package.json yarn.lock ./
+#16 [multibuzzer stage-1 4/7] RUN yarn install --production --frozen-lockfile
 #16 CACHED
 
-#17 [multibuzzer stage-1 4/7] RUN yarn install --production --frozen-lockfile
-#17 CACHED
+#17 [multibuzzer stage-1 5/7] COPY --from=builder /app/build ./build
+#17 DONE 0.0s
 
 #18 [multibuzzer stage-1 6/7] COPY --from=builder /app/public ./public
-#18 CACHED
+#18 DONE 0.0s
 
 #19 [multibuzzer stage-1 7/7] COPY --from=builder /app/src ./src
-#19 CACHED
- Service multibuzzer  Built
+#19 DONE 0.0s
 
 #20 [multibuzzer] exporting to image
-#20 exporting layers done
-#20 writing image sha256:c002791343ff57891bd63b98df917847cd1c0eafa8f3348fb547a9419a342f6b done
+#20 exporting layers 0.0s done
+#20 writing image sha256:4fd2bc6c87e5e922116e367f1cd0aa5c3c53f3a433ecfea10db5fbda85fe2f5b
+ Service multibuzzer  Built
+#20 writing image sha256:4fd2bc6c87e5e922116e367f1cd0aa5c3c53f3a433ecfea10db5fbda85fe2f5b done
 #20 naming to docker.io/library/multibuzzer-multibuzzer done
 #20 DONE 0.0s
 

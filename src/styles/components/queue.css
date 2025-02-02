@@ -19,17 +19,19 @@
 
 .App .queue li .player-sign {
   display: inline-block;
-  min-width: 150px;
-  padding: 8px 15px;
-  border-radius: 8px;
+  width: 100%;
+  max-width: 300px;
+  padding: 12px 20px;
+  border-radius: 12px;
   transition: all ease-in-out 0.2s;
   background-color: var(--darkBlueColor);
-  margin: 4px 0;
+  margin: 6px 0;
 }
 
 .App .queue li:first-child .player-sign {
   background-color: var(--brightBlueColor);
   box-shadow: 0 0 15px rgba(52, 141, 245, 0.2);
+  padding: 16px 20px;
 }
 
 .App .player-info {
@@ -169,12 +171,88 @@
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
+/* Tablet */
 @media screen and (max-width: 767px) {
   .App .player-info {
-    gap: 5px;
+    gap: 10px;
   }
   
   .App .score {
     font-size: 1.2rem;
+    padding: 6px 10px;
+  }
+
+  .App .queue li {
+    font-size: 1.3rem;
+  }
+
+  .App .queue li .player-sign {
+    padding: 10px 16px;
+  }
+}
+
+/* Mobile */
+@media screen and (max-width: 480px) {
+  .App .queue {
+    margin-top: 20px;
+  }
+
+  .App .queue li {
+    font-size: 1.1rem;
+  }
+
+  .App .queue li .player-sign {
+    padding: 8px 12px;
+  }
+
+  .App .queue li:first-child .player-sign {
+    padding: 12px 16px;
+  }
+
+  .App .score-popup {
+    position: fixed;
+    top: auto;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 280px;
+    margin-top: 0;
+    padding: 16px;
+  }
+
+  .App .score-popup::before {
+    display: none;
+  }
+
+  .App .queue li .name .sound-toggle {
+    padding: 8px;
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) {
+  .App .score.clickable:hover {
+    background-color: transparent;
+  }
+
+  .App .score.clickable:active {
+    background-color: var(--lightBackgroundColor);
+  }
+
+  .App .queue li.resettable .player-sign:hover {
+    background-color: var(--darkBlueColor);
+  }
+
+  .App .queue li.resettable .player-sign:active {
+    background-color: var(--lightBackgroundColor);
+  }
+
+  .App .queue li .name .sound-toggle:hover {
+    background-color: transparent;
+  }
+
+  .App .queue li .name .sound-toggle:active {
+    background-color: var(--lightBackgroundColor);
   }
 }

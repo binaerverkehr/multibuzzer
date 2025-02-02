@@ -59,23 +59,46 @@
   opacity: 0.8;
 }
 
+/* Tablet */
 @media screen and (max-width: 767px) {
   .App #buzzer > button {
-    width: 200px;
-    height: 200px;
-    font-size: 1.5rem;
+    width: 220px;
+    height: 220px;
+    font-size: 1.6rem;
   }
   
   .App #buzzer {
     margin: 0;
-    min-height: 220px;
+    min-height: 240px;
   }
 }
 
+/* Mobile */
 @media screen and (max-width: 480px) {
   .App #buzzer > button {
-    width: 180px;
-    height: 180px;
-    font-size: 1.3rem;
+    width: 160px;
+    height: 160px;
+    font-size: 1.2rem;
+  }
+  
+  .App #buzzer {
+    min-height: 180px;
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) {
+  .App #buzzer > button {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .App #buzzer > button:hover {
+    transform: none;
+    box-shadow: 0 0 20px rgba(52, 141, 245, 0.2);
+  }
+
+  .App #buzzer > button:active {
+    transform: scale(0.95);
+    background-color: var(--darkBlueColor);
   }
 }

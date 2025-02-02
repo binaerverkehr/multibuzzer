@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Navbar } from 'react-bootstrap';
+import { Navbar, Nav } from 'react-bootstrap';
 import { useHistory } from 'react-router';
 import { leaveRoom } from '../lib/endpoints';
 import { BsSoundwave, BsVolumeMute } from 'react-icons/bs';
@@ -21,12 +21,7 @@ function Logo({ size = 25 }) {
   );
 }
 
-export default function Header({
-  auth = {},
-  clearAuth,
-  roomID,
-  playerName
-}) {
+export default function Header({ auth = {}, clearAuth, roomID, playerName }) {
   const history = useHistory();
   const [playerSound, setPlayerSound] = useState(() => {
     const savedSound = localStorage.getItem('playerSound');
@@ -53,42 +48,36 @@ export default function Header({
 
   return (
     <header>
-      <Navbar>
-        <div className="navbar-left">
-          <Navbar.Brand>
-            <Logo /> Multibuzzer
-          </Navbar.Brand>
-          <div className="header-info">
-            {roomID && (
-              <div className="room-id">
-                Room: {roomID}
-              </div>
-            )}
-            {playerName && (
-              <div className="player-name">
-                Player: {playerName}
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="nav-buttons">
-          <button
-            className={`text-button sound-button ${playerSound ? 'active' : ''}`}
-            onClick={() => setPlayerSound(!playerSound)}
-            title={playerSound ? "Sound On" : "Sound Off"}
-          >
-            {playerSound ? <BsSoundwave /> : <BsVolumeMute />}
-          </button>
-          {clearAuth && (
-            <button 
-              className="text-button" 
-              onClick={() => leave()}
-              aria-label="Leave current game"
+      <Navbar expand="md">
+        <Navbar.Brand>
+          <Logo /> Multibuzzer
+        </Navbar.Brand>
+        <Navbar.Toggle aria-controls="navbar-nav" />
+        <Navbar.Collapse id="navbar-nav">
+          <Nav className="me-auto header-info">
+            {roomID && <div className="room-id">Room: {roomID}</div>}
+            {playerName && <div className="player-name">Player: {playerName}</div>}
+          </Nav>
+          <Nav className="nav-buttons">
+            <button
+              className={`text-button sound-button ${playerSound ? 'active' : ''
+                }`}
+              onClick={() => setPlayerSound(!playerSound)}
+              title={playerSound ? 'Sound On' : 'Sound Off'}
             >
-              Leave game
+              {playerSound ? <BsSoundwave /> : <BsVolumeMute />}
             </button>
-          )}
-        </div>
+            {clearAuth && (
+              <button
+                className="text-button"
+                onClick={() => leave()}
+                aria-label="Leave current game"
+              >
+                Leave game
+              </button>
+            )}
+          </Nav>
+        </Navbar.Collapse>
       </Navbar>
     </header>
   );

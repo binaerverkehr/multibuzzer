@@ -79,18 +79,61 @@
   cursor: not-allowed;
 }
 
+/* Tablet */
 @media screen and (max-width: 767px) {
   .game-sections-grid {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 0 1rem;
+  }
+
+  .game-section {
+    padding: 1.25rem;
+  }
+
+  .container {
+    padding: 1.5rem 1rem 100px;
+    padding-bottom: calc(100px + env(safe-area-inset-bottom));
+  }
+}
+
+/* Mobile */
+@media screen and (max-width: 480px) {
+  .game-sections-grid {
     gap: 1rem;
-    padding: 0 0.5rem;
+    padding: 0 0.75rem;
+    margin-top: 1.5rem;
   }
 
   .game-section {
     padding: 1rem;
+    border-radius: 12px;
   }
 
   .container {
-    padding: 1rem 0.5rem 100px;
+    padding: 1rem 0.75rem;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  }
+
+  .text-input-container {
+    padding: 1rem;
+  }
+
+  .text-input-container input,
+  .text-input-container button {
+    padding: 0.875rem;
+    border-radius: 8px;
+    font-size: 1rem;
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) {
+  .text-input-container button:hover:not(:disabled) {
+    background-color: var(--brightBlueColor);
+  }
+
+  .text-input-container button:active:not(:disabled) {
+    background-color: var(--hoverBlueColor);
   }
 }
